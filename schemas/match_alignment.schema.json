@@ -1,0 +1,478 @@
+{
+  "type": "json_schema",
+  "name": "match_alignment_v1",
+  "strict": true,
+  "description": "个人与岗位的证据对齐输出",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "match_meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "match_id": {
+            "type": "string"
+          },
+          "profile_version": {
+            "type": "string"
+          },
+          "job_id": {
+            "type": "string"
+          },
+          "analysis_mode": {
+            "type": "string",
+            "enum": [
+              "career_exploration",
+              "current_application",
+              "future_planning"
+            ]
+          },
+          "input_status": {
+            "type": "string",
+            "enum": [
+              "sufficient",
+              "partial",
+              "incompatible",
+              "conflict"
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "match_id",
+          "profile_version",
+          "job_id",
+          "analysis_mode",
+          "input_status",
+          "warnings"
+        ]
+      },
+      "current_application_eligibility": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "pending",
+              "current_cycle_conflict",
+              "structural_conflict"
+            ]
+          },
+          "passed_conditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "conflicting_conditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unknown_conditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "time_snapshot_conditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "explanation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "passed_conditions",
+          "conflicting_conditions",
+          "unknown_conditions",
+          "time_snapshot_conditions",
+          "explanation"
+        ]
+      },
+      "task_alignments": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "job_task_cluster_id": {
+              "type": "string"
+            },
+            "preference_alignment": {
+              "type": "string",
+              "enum": [
+                "positive",
+                "neutral",
+                "negative",
+                "untested"
+              ]
+            },
+            "preference_evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readiness_evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "readiness_evidence_level": {
+              "type": "string",
+              "enum": [
+                "direct_strong",
+                "direct_basic",
+                "transferable",
+                "self_report_only",
+                "not_demonstrated",
+                "confirmed_gap",
+                "unknown"
+              ]
+            },
+            "preference_risk": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "explanation": {
+              "type": "string"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            }
+          },
+          "required": [
+            "job_task_cluster_id",
+            "preference_alignment",
+            "preference_evidence_ids",
+            "readiness_evidence_ids",
+            "readiness_evidence_level",
+            "preference_risk",
+            "explanation",
+            "confidence"
+          ]
+        }
+      },
+      "capability_alignments": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "job_capability_id": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "supported",
+                "partially_supported",
+                "not_demonstrated",
+                "confirmed_gap",
+                "unknown"
+              ]
+            },
+            "user_evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "gap_type": {
+              "type": "string",
+              "enum": [
+                "none",
+                "current_cycle_gap",
+                "structural_gap",
+                "capability_gap",
+                "evidence_gap",
+                "preference_risk",
+                "information_gap"
+              ]
+            },
+            "explanation": {
+              "type": "string"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            }
+          },
+          "required": [
+            "job_capability_id",
+            "status",
+            "user_evidence_ids",
+            "gap_type",
+            "explanation",
+            "confidence"
+          ]
+        }
+      },
+      "career_direction_assessment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "direction_alignment": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "unknown"
+            ]
+          },
+          "growth_value": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "unknown"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "supporting_points": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "opposing_points": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exploration_questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "future_preparation_items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "direction_alignment",
+          "growth_value",
+          "confidence",
+          "supporting_points",
+          "opposing_points",
+          "exploration_questions",
+          "future_preparation_items"
+        ]
+      },
+      "gap_summary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "current_cycle_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "structural_feasibility_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "capability_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "preference_risks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "information_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "current_cycle_gaps",
+          "structural_feasibility_gaps",
+          "capability_gaps",
+          "evidence_gaps",
+          "preference_risks",
+          "information_gaps"
+        ]
+      },
+      "user_facing_explanation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "one_sentence_conclusion": {
+            "type": "string"
+          },
+          "highly_aligned_points": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "partially_aligned_points": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "main_risks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "questions_before_application": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "resume_focus_candidates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prohibited_resume_additions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "one_sentence_conclusion",
+          "highly_aligned_points",
+          "partially_aligned_points",
+          "main_risks",
+          "questions_before_application",
+          "resume_focus_candidates",
+          "prohibited_resume_additions"
+        ]
+      },
+      "profile_evidence_registry": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "evidence_id": {
+              "type": "string",
+              "description": "当前输出内唯一证据编号"
+            },
+            "source_type": {
+              "type": "string",
+              "enum": [
+                "resume",
+                "questionnaire",
+                "user_confirmed",
+                "jd",
+                "behavior"
+              ]
+            },
+            "source_reference": {
+              "type": "string",
+              "description": "页码、段落、题号或原始字段"
+            },
+            "source_text": {
+              "type": "string",
+              "description": "支持结论的最短必要原文"
+            },
+            "claim_type": {
+              "type": "string",
+              "enum": [
+                "explicit",
+                "inferred",
+                "unknown"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            }
+          },
+          "required": [
+            "evidence_id",
+            "source_type",
+            "source_reference",
+            "source_text",
+            "claim_type",
+            "confidence"
+          ]
+        }
+      }
+    },
+    "required": [
+      "match_meta",
+      "current_application_eligibility",
+      "task_alignments",
+      "capability_alignments",
+      "career_direction_assessment",
+      "gap_summary",
+      "user_facing_explanation",
+      "profile_evidence_registry"
+    ],
+    "description": "个人画像与岗位画像之间的逐项证据对齐，不包含最终分数"
+  }
+}

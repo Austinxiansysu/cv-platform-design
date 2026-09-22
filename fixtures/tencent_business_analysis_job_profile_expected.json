@@ -1,0 +1,505 @@
+{
+  "job_meta": {
+    "job_id": "JD-009",
+    "original_title": "商业分析",
+    "company": "腾讯",
+    "team_or_department": "多个事业群，具体团队未知",
+    "source_type": "company_official",
+    "source_reference": "https://join.qq.com/post_detail.html?postid=1224067393358393344",
+    "collected_at": "2026-09-20",
+    "posting_status": "available_when_collected",
+    "source_reliability": "high",
+    "input_status": "partial"
+  },
+  "basic_conditions": {
+    "locations": [],
+    "work_mode": "unknown",
+    "recruitment_type": "graduate_internship",
+    "graduation_cohorts": {
+      "status": "unknown",
+      "values": [],
+      "requirement_strength": "uncertain",
+      "evidence_id": null
+    },
+    "degree_requirements": {
+      "status": "unknown",
+      "minimum_degree": null,
+      "requirement_strength": "uncertain",
+      "evidence_id": null
+    },
+    "major_requirements": {
+      "status": "unknown",
+      "must_have": [],
+      "preferred": [],
+      "evidence_id": null
+    },
+    "days_per_week": {
+      "status": "unknown",
+      "minimum": null,
+      "maximum": null,
+      "evidence_id": null
+    },
+    "duration_months": {
+      "status": "unknown",
+      "minimum": null,
+      "preferred": null,
+      "evidence_id": null
+    },
+    "earliest_start": {
+      "status": "unknown",
+      "value": null,
+      "evidence_id": null
+    },
+    "language_requirements": [
+      {
+        "language": "英语",
+        "expected_level": "熟练",
+        "requirement_strength": "must",
+        "evidence_id": "J09-E06"
+      }
+    ],
+    "interview_mode": "远程面试",
+    "other_application_conditions": [
+      {
+        "condition_name": "学业成绩",
+        "normalized_value": "学业成绩优异",
+        "requirement_strength": "must",
+        "gate_type": "qualitative_requirement",
+        "evidence_id": "J09-E06"
+      }
+    ]
+  },
+  "function_classification": {
+    "official_category": "市场-商业分析",
+    "primary_function": "商业分析",
+    "secondary_functions": [
+      "战略分析",
+      "用户洞察",
+      "商业计划",
+      "跨团队项目推进"
+    ],
+    "adjacent_role_names": [
+      "战略分析",
+      "经营分析",
+      "用户研究",
+      "商业策略"
+    ],
+    "title_task_consistency": "high",
+    "consistency_explanation": "岗位标题与行业、用户、战略和商业计划任务基本一致。",
+    "confidence": "high",
+    "evidence_ids": [
+      "J09-E01",
+      "J09-E02",
+      "J09-E03",
+      "J09-E04",
+      "J09-E05"
+    ],
+    "title_transparency": "high",
+    "transparency_explanation": "商业分析标题能够概括行业、用户、战略和商业计划任务。"
+  },
+  "tasks": [
+    {
+      "task_id": "J09-T01",
+      "normalized_task": "行业与竞争环境研究",
+      "original_text": "分析行业趋势、商业模式、产品创新和竞争环境",
+      "importance": "core",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "行业",
+        "商业模式",
+        "竞争环境"
+      ],
+      "deliverables": [
+        "行业与竞争分析"
+      ],
+      "autonomy_level": "unknown",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J09-E01"
+      ]
+    },
+    {
+      "task_id": "J09-T02",
+      "normalized_task": "用户行为与需求研究",
+      "original_text": "通过定性及定量研究洞察用户变化和需求演进",
+      "importance": "core",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "用户行为",
+        "用户需求"
+      ],
+      "deliverables": [
+        "用户洞察",
+        "战略机会判断"
+      ],
+      "autonomy_level": "unknown",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J09-E02"
+      ]
+    },
+    {
+      "task_id": "J09-T03",
+      "normalized_task": "战略分析与决策建议",
+      "original_text": "为业务管理和商业决策提供专项分析与建议",
+      "importance": "core",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "业务管理层",
+        "商业决策"
+      ],
+      "deliverables": [
+        "专项战略分析",
+        "决策建议"
+      ],
+      "autonomy_level": "unknown",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J09-E03"
+      ]
+    },
+    {
+      "task_id": "J09-T04",
+      "normalized_task": "商业与项目计划支持",
+      "original_text": "协助制定事业群及部门商业和项目计划",
+      "importance": "important_support",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "事业群",
+        "部门"
+      ],
+      "deliverables": [
+        "商业计划",
+        "项目计划"
+      ],
+      "autonomy_level": "explicit_assist",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J09-E04"
+      ]
+    },
+    {
+      "task_id": "J09-T05",
+      "normalized_task": "跨团队战略项目推进",
+      "original_text": "支持跨团队、跨事业群项目执行与落地",
+      "importance": "important_support",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "跨团队项目",
+        "跨事业群项目"
+      ],
+      "deliverables": [
+        "项目执行与落地"
+      ],
+      "autonomy_level": "explicit_assist",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J09-E05"
+      ]
+    }
+  ],
+  "capability_requirements": [
+    {
+      "capability_id": "J09-C01",
+      "capability_name": "快速学习与好奇心",
+      "capability_type": "general",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "快速学习能力强并保持好奇心",
+      "evidence_id": "J09-E06",
+      "confidence": "high",
+      "claim_type": "explicit"
+    },
+    {
+      "capability_id": "J09-C02",
+      "capability_name": "沟通与人际交往",
+      "capability_type": "communication",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "沟通及人际交往能力突出",
+      "evidence_id": "J09-E06",
+      "confidence": "high",
+      "claim_type": "explicit"
+    },
+    {
+      "capability_id": "J09-C03",
+      "capability_name": "商业理解与结构化思维",
+      "capability_type": "business_analysis",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "理解基本商业问题并能结构化拆解",
+      "evidence_id": "J09-E07",
+      "confidence": "high",
+      "claim_type": "explicit"
+    },
+    {
+      "capability_id": "J09-C04",
+      "capability_name": "团队合作与责任感",
+      "capability_type": "general",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "具备责任感和团队合作能力",
+      "evidence_id": "J09-E06",
+      "confidence": "high",
+      "claim_type": "explicit"
+    }
+  ],
+  "tool_requirements": [],
+  "relevance_dimensions": {
+    "ai_relevance": {
+      "level": 0,
+      "evidence_ids": []
+    },
+    "data_relevance": {
+      "level": 2,
+      "evidence_ids": [
+        "J09-E02"
+      ]
+    },
+    "finance_relevance": {
+      "level": 0,
+      "evidence_ids": []
+    },
+    "product_relevance": {
+      "level": 1,
+      "evidence_ids": [
+        "J09-E01"
+      ]
+    },
+    "research_relevance": {
+      "level": 3,
+      "evidence_ids": [
+        "J09-E01",
+        "J09-E02",
+        "J09-E03"
+      ]
+    },
+    "client_facing_relevance": {
+      "level": 0,
+      "evidence_ids": []
+    }
+  },
+  "work_style": {
+    "customer_communication": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    },
+    "cross_functional_collaboration": {
+      "status": "known",
+      "value": "high",
+      "claim_type": "explicit",
+      "evidence_ids": [
+        "J09-E05"
+      ]
+    },
+    "independent_analysis": {
+      "status": "possible",
+      "value": "medium",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J09-E01",
+        "J09-E02",
+        "J09-E03"
+      ]
+    },
+    "research_vs_execution": {
+      "status": "possible",
+      "value": "mixed_research_leaning",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J09-E01",
+        "J09-E02",
+        "J09-E05"
+      ]
+    },
+    "repetitive_work": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    },
+    "open_endedness": {
+      "status": "known",
+      "value": "high",
+      "claim_type": "explicit",
+      "evidence_ids": [
+        "J09-E01",
+        "J09-E02"
+      ]
+    },
+    "technical_depth": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    },
+    "travel_or_client_site": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    },
+    "intensity": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    }
+  },
+  "job_uncertainties": {
+    "missing_fields": [
+      "具体事业群与团队",
+      "工作地点",
+      "招聘届别",
+      "学历",
+      "每周到岗",
+      "实习时长",
+      "常用数据工具",
+      "任务时间占比"
+    ],
+    "contradictions": [],
+    "sensitive_requirements": [],
+    "verification_questions": [
+      "岗位具体属于哪个事业群和团队？",
+      "定性研究、定量分析和项目推进分别占多少时间？",
+      "常用数据工具是什么？",
+      "实习生的分析成果主要由谁使用？",
+      "工作地点、届别、每周到岗和最低实习时长是什么？"
+    ],
+    "warnings": [
+      "不同事业群可能对应不同业务内容，当前JD不足以形成统一的团队级画像。"
+    ]
+  },
+  "evidence_registry": [
+    {
+      "evidence_id": "J09-E01",
+      "source_type": "jd",
+      "source_reference": "岗位描述1",
+      "source_text": "分析行业商业模式、产品创新和竞争环境",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J09-E02",
+      "source_type": "jd",
+      "source_reference": "岗位描述2",
+      "source_text": "通过定性及定量研究洞察用户变化",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J09-E03",
+      "source_type": "jd",
+      "source_reference": "岗位描述3",
+      "source_text": "提供专项战略分析及决策建议",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J09-E04",
+      "source_type": "jd",
+      "source_reference": "岗位描述4",
+      "source_text": "协助制定商业及项目计划",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J09-E05",
+      "source_type": "jd",
+      "source_reference": "岗位描述5",
+      "source_text": "支持跨团队项目执行与落地",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J09-E06",
+      "source_type": "jd",
+      "source_reference": "岗位要求1至3",
+      "source_text": "学习、沟通、英语、责任感与团队合作",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J09-E07",
+      "source_type": "jd",
+      "source_reference": "岗位要求4",
+      "source_text": "理解商业问题并具备结构化思维",
+      "claim_type": "explicit",
+      "confidence": "high"
+    }
+  ],
+  "task_clusters": [
+    {
+      "cluster_id": "J09-G01",
+      "cluster_name": "行业与竞争研究",
+      "task_ids": [
+        "J09-T01"
+      ],
+      "importance": "core",
+      "rationale": "研究行业、商业模式、产品创新和竞争环境。",
+      "evidence_ids": [
+        "J09-E01"
+      ]
+    },
+    {
+      "cluster_id": "J09-G02",
+      "cluster_name": "用户行为与需求研究",
+      "task_ids": [
+        "J09-T02"
+      ],
+      "importance": "core",
+      "rationale": "定性和定量用户研究具有独立偏好与能力要求。",
+      "evidence_ids": [
+        "J09-E02"
+      ]
+    },
+    {
+      "cluster_id": "J09-G03",
+      "cluster_name": "战略分析与决策建议",
+      "task_ids": [
+        "J09-T03"
+      ],
+      "importance": "core",
+      "rationale": "将研究转化为管理和决策建议。",
+      "evidence_ids": [
+        "J09-E03"
+      ]
+    },
+    {
+      "cluster_id": "J09-G04",
+      "cluster_name": "商业与项目计划支持",
+      "task_ids": [
+        "J09-T04"
+      ],
+      "importance": "important_support",
+      "rationale": "制定商业和项目计划。",
+      "evidence_ids": [
+        "J09-E04"
+      ]
+    },
+    {
+      "cluster_id": "J09-G05",
+      "cluster_name": "跨团队项目推进",
+      "task_ids": [
+        "J09-T05"
+      ],
+      "importance": "important_support",
+      "rationale": "协调推进与独立分析属于不同工作体验。",
+      "evidence_ids": [
+        "J09-E05"
+      ]
+    }
+  ],
+  "experience_requirements": []
+}

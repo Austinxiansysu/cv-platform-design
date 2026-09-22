@@ -1,0 +1,243 @@
+{
+  "match_meta": {
+    "match_id": "MATCH-P001-JD009",
+    "profile_version": "profile-v1",
+    "job_id": "JD-009",
+    "analysis_mode": "career_exploration",
+    "input_status": "partial",
+    "warnings": [
+      "具体事业群、地点、届别和实习安排未知。"
+    ]
+  },
+  "current_application_eligibility": {
+    "status": "pending",
+    "passed_conditions": [],
+    "conflicting_conditions": [],
+    "unknown_conditions": [
+      "招聘届别",
+      "学历",
+      "工作地点",
+      "每周到岗",
+      "实习时长"
+    ],
+    "time_snapshot_conditions": [
+      "应届实习分类但未给出具体届别"
+    ],
+    "explanation": "当前申请资格无法判断，但职业方向分析可以继续。"
+  },
+  "task_alignments": [
+    {
+      "preference_alignment": "positive",
+      "preference_evidence_ids": [
+        "P-E02"
+      ],
+      "readiness_evidence_ids": [
+        "P-E02",
+        "P-E03"
+      ],
+      "readiness_evidence_level": "transferable",
+      "preference_risk": "长期案头研究偏好尚未验证",
+      "explanation": "案例分析与建模支持结构化研究，但没有真实行业跟踪经验。",
+      "confidence": "medium",
+      "job_task_cluster_id": "J09-G01"
+    },
+    {
+      "preference_alignment": "untested",
+      "preference_evidence_ids": [],
+      "readiness_evidence_ids": [
+        "P-E03"
+      ],
+      "readiness_evidence_level": "transferable",
+      "preference_risk": "用户研究偏好未验证",
+      "explanation": "有定量思维证据，但没有用户研究和真实业务数据经验。",
+      "confidence": "medium",
+      "job_task_cluster_id": "J09-G02"
+    },
+    {
+      "preference_alignment": "positive",
+      "preference_evidence_ids": [
+        "P-E02"
+      ],
+      "readiness_evidence_ids": [
+        "P-E02"
+      ],
+      "readiness_evidence_level": "transferable",
+      "preference_risk": "建议实际落地的偏好和能力尚未验证",
+      "explanation": "案例比赛提供分析和报告证据，但不是企业决策场景。",
+      "confidence": "medium",
+      "job_task_cluster_id": "J09-G03"
+    },
+    {
+      "preference_alignment": "neutral",
+      "preference_evidence_ids": [],
+      "readiness_evidence_ids": [
+        "P-E02"
+      ],
+      "readiness_evidence_level": "transferable",
+      "preference_risk": "商业计划经验不足",
+      "explanation": "有团队方案经历，但没有真实商业计划证据。",
+      "confidence": "low",
+      "job_task_cluster_id": "J09-G04"
+    },
+    {
+      "preference_alignment": "untested",
+      "preference_evidence_ids": [],
+      "readiness_evidence_ids": [],
+      "readiness_evidence_level": "not_demonstrated",
+      "preference_risk": "会议、协调和跟进执行可能降低兴趣",
+      "explanation": "用户尚未验证跨部门项目推进偏好，也没有直接证据。",
+      "confidence": "medium",
+      "job_task_cluster_id": "J09-G05"
+    }
+  ],
+  "capability_alignments": [
+    {
+      "job_capability_id": "J09-C01",
+      "status": "partially_supported",
+      "user_evidence_ids": [
+        "P-E01",
+        "P-E03"
+      ],
+      "gap_type": "evidence_gap",
+      "explanation": "多个项目体现学习和探索，但缺少统一的成果证据。",
+      "confidence": "medium"
+    },
+    {
+      "job_capability_id": "J09-C02",
+      "status": "not_demonstrated",
+      "user_evidence_ids": [],
+      "gap_type": "evidence_gap",
+      "explanation": "暂无突出沟通和人际交往能力的直接证据。",
+      "confidence": "medium"
+    },
+    {
+      "job_capability_id": "J09-C03",
+      "status": "partially_supported",
+      "user_evidence_ids": [
+        "P-E02",
+        "P-E03"
+      ],
+      "gap_type": "evidence_gap",
+      "explanation": "案例分析与数学建模支持结构化思维，但真实商业环境证据不足。",
+      "confidence": "high"
+    },
+    {
+      "job_capability_id": "J09-C04",
+      "status": "partially_supported",
+      "user_evidence_ids": [
+        "P-E02",
+        "P-E03"
+      ],
+      "gap_type": "evidence_gap",
+      "explanation": "比赛包含团队协作，但责任范围和结果证据仍需整理。",
+      "confidence": "medium"
+    }
+  ],
+  "career_direction_assessment": {
+    "supporting_points": [
+      "喜欢商业问题分析",
+      "具备结构化和定量思维基础",
+      "希望理解产业与互联网业务"
+    ],
+    "opposing_points": [
+      "用户研究未体验",
+      "跨团队推进偏好未知",
+      "真实公司数据与战略落地证据不足"
+    ],
+    "exploration_questions": [
+      "是否喜欢长期行业跟踪？",
+      "是否接受跨团队协调？",
+      "是否喜欢用户研究？"
+    ],
+    "future_preparation_items": [
+      "学习商业分析基本框架",
+      "补充SQL",
+      "做一份真实公司或行业分析",
+      "整理比赛成果证据"
+    ],
+    "direction_alignment": "high",
+    "growth_value": "high",
+    "confidence": "medium"
+  },
+  "gap_summary": {
+    "current_cycle_gaps": [],
+    "structural_feasibility_gaps": [],
+    "capability_gaps": [],
+    "evidence_gaps": [
+      "真实互联网业务",
+      "用户研究",
+      "战略落地",
+      "沟通与项目推进"
+    ],
+    "preference_risks": [
+      "跨团队协调",
+      "长期案头研究"
+    ],
+    "information_gaps": [
+      "事业群与团队",
+      "届别",
+      "地点",
+      "到岗天数",
+      "实习时长",
+      "工具",
+      "任务占比"
+    ]
+  },
+  "user_facing_explanation": {
+    "one_sentence_conclusion": "商业分析值得作为优先探索方向，但这条JD的信息不足以支持当前投递判断。",
+    "highly_aligned_points": [
+      "商业问题分析",
+      "行业与竞争研究",
+      "结构化思维"
+    ],
+    "partially_aligned_points": [
+      "定量研究",
+      "战略建议"
+    ],
+    "main_risks": [
+      "跨团队推进偏好未知",
+      "用户研究和真实业务证据不足"
+    ],
+    "questions_before_application": [
+      "具体事业群和地点是什么？",
+      "定量分析占比和工具是什么？",
+      "实习生负责到什么程度？"
+    ],
+    "resume_focus_candidates": [
+      "岭南杯中的商业问题拆解与报告",
+      "数学建模中的定量分析"
+    ],
+    "prohibited_resume_additions": [
+      "腾讯业务经验",
+      "用户研究经验",
+      "企业战略落地经验",
+      "熟练SQL"
+    ]
+  },
+  "profile_evidence_registry": [
+    {
+      "evidence_id": "P-E01",
+      "source_type": "user_confirmed",
+      "source_reference": "企业官网项目",
+      "source_text": "使用AI完成企业官网需求到交付",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E02",
+      "source_type": "user_confirmed",
+      "source_reference": "岭南杯",
+      "source_text": "案例分析比赛经历",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E03",
+      "source_type": "user_confirmed",
+      "source_reference": "数学建模比赛",
+      "source_text": "定量分析和建模经历",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    }
+  ]
+}

@@ -1,0 +1,679 @@
+{
+  "type": "json_schema",
+  "name": "candidate_profile_v1",
+  "strict": true,
+  "description": "个人画像结构化输出",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "profile_meta": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "profile_version": {
+            "type": "string"
+          },
+          "generated_at": {
+            "type": "string"
+          },
+          "input_status": {
+            "type": "string",
+            "enum": [
+              "sufficient",
+              "partial",
+              "incompatible",
+              "conflict"
+            ]
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confirmation_status": {
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "partially_confirmed",
+              "unconfirmed"
+            ]
+          }
+        },
+        "required": [
+          "profile_version",
+          "generated_at",
+          "input_status",
+          "source_ids",
+          "confirmation_status"
+        ]
+      },
+      "background": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "school": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "college_or_major": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "degree": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "graduation_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "current_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "optional_academic_records": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "school",
+          "college_or_major",
+          "degree",
+          "current_year",
+          "graduation_year",
+          "current_city",
+          "languages",
+          "optional_academic_records"
+        ]
+      },
+      "availability_constraints": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "semester_internship_available": {
+            "type": "boolean"
+          },
+          "vacation_days_per_week_min": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vacation_days_per_week_max": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 7
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duration_months_min": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "duration_months_max": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "acceptable_locations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remote_preference": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "conditional",
+              "reject",
+              "unknown"
+            ]
+          },
+          "travel_preference": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "conditional",
+              "prefer_not",
+              "reject",
+              "unknown"
+            ]
+          },
+          "intensity_preference": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "semester_internship_available",
+          "vacation_days_per_week_min",
+          "vacation_days_per_week_max",
+          "duration_months_min",
+          "duration_months_max",
+          "acceptable_locations",
+          "remote_preference",
+          "travel_preference",
+          "intensity_preference"
+        ]
+      },
+      "skills": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "skill_id": {
+              "type": "string"
+            },
+            "skill_name": {
+              "type": "string"
+            },
+            "normalized_skill": {
+              "type": "string"
+            },
+            "self_reported_level": {
+              "type": "string"
+            },
+            "evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "evidence_strength": {
+              "type": "string",
+              "enum": [
+                "direct_strong",
+                "direct_basic",
+                "transferable",
+                "self_report_only",
+                "not_demonstrated",
+                "confirmed_gap",
+                "unknown"
+              ]
+            },
+            "last_used": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "displayable_artifact": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "confirmation_needed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "skill_id",
+            "skill_name",
+            "normalized_skill",
+            "self_reported_level",
+            "evidence_ids",
+            "evidence_strength",
+            "last_used",
+            "displayable_artifact",
+            "confirmation_needed"
+          ]
+        }
+      },
+      "experiences": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "experience_id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "organization_or_context": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "start_date": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "end_date": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "problem": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "user_actions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deliverables": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "outcomes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "verifiable_materials": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "prohibited_claims": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "confirmation_needed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "experience_id",
+            "title",
+            "organization_or_context",
+            "start_date",
+            "end_date",
+            "problem",
+            "user_actions",
+            "tools",
+            "deliverables",
+            "outcomes",
+            "verifiable_materials",
+            "prohibited_claims",
+            "evidence_ids",
+            "confirmation_needed"
+          ]
+        }
+      },
+      "task_preferences": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "task_name": {
+              "type": "string"
+            },
+            "preference_level": {
+              "type": "string",
+              "enum": [
+                "strong_dislike",
+                "dislike",
+                "untested",
+                "like",
+                "strong_like"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "confirmed",
+                "hypothesis",
+                "untested"
+              ]
+            }
+          },
+          "required": [
+            "task_name",
+            "preference_level",
+            "confidence",
+            "evidence_ids",
+            "status"
+          ]
+        }
+      },
+      "work_style_preferences": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dimension_name": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            },
+            "evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "confirmed",
+                "hypothesis",
+                "untested"
+              ]
+            }
+          },
+          "required": [
+            "dimension_name",
+            "value",
+            "confidence",
+            "evidence_ids",
+            "status"
+          ]
+        }
+      },
+      "career_hypotheses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "direction_name": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "priority",
+                "exploring",
+                "deprioritized"
+              ]
+            },
+            "supporting_evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unresolved_questions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "next_validation_action": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "direction_name",
+            "status",
+            "supporting_evidence_ids",
+            "unresolved_questions",
+            "next_validation_action"
+          ]
+        }
+      },
+      "profile_gaps": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "missing_information": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confirmed_skill_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "contradictions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "user_confirmation_questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "missing_information",
+          "evidence_gaps",
+          "confirmed_skill_gaps",
+          "contradictions",
+          "user_confirmation_questions"
+        ]
+      },
+      "evidence_registry": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "evidence_id": {
+              "type": "string",
+              "description": "当前输出内唯一证据编号"
+            },
+            "source_type": {
+              "type": "string",
+              "enum": [
+                "resume",
+                "questionnaire",
+                "user_confirmed",
+                "jd",
+                "behavior"
+              ]
+            },
+            "source_reference": {
+              "type": "string",
+              "description": "页码、段落、题号或原始字段"
+            },
+            "source_text": {
+              "type": "string",
+              "description": "支持结论的最短必要原文"
+            },
+            "claim_type": {
+              "type": "string",
+              "enum": [
+                "explicit",
+                "inferred",
+                "unknown"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ]
+            }
+          },
+          "required": [
+            "evidence_id",
+            "source_type",
+            "source_reference",
+            "source_text",
+            "claim_type",
+            "confidence"
+          ]
+        }
+      }
+    },
+    "required": [
+      "profile_meta",
+      "background",
+      "availability_constraints",
+      "skills",
+      "experiences",
+      "task_preferences",
+      "work_style_preferences",
+      "career_hypotheses",
+      "profile_gaps",
+      "evidence_registry"
+    ],
+    "description": "仅由简历、问卷和用户确认材料建立的结构化个人画像"
+  }
+}

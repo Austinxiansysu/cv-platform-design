@@ -1,0 +1,528 @@
+{
+  "job_meta": {
+    "job_id": "JD-007",
+    "original_title": "FDE实习生-飞书商业化",
+    "company": "字节跳动",
+    "team_or_department": "飞书商业化",
+    "source_type": "company_official",
+    "source_reference": "https://jobs.bytedance.com/campus/position/7651867378416388357/detail",
+    "collected_at": "2026-09-20",
+    "posting_status": "available_when_collected",
+    "source_reliability": "high",
+    "input_status": "sufficient"
+  },
+  "basic_conditions": {
+    "locations": [
+      "广州"
+    ],
+    "work_mode": "onsite_or_unknown",
+    "recruitment_type": "byteintern",
+    "graduation_cohorts": {
+      "status": "known",
+      "values": [
+        "2027届"
+      ],
+      "requirement_strength": "must",
+      "evidence_id": "J07-E01"
+    },
+    "degree_requirements": {
+      "status": "known",
+      "minimum_degree": "本科",
+      "requirement_strength": "must",
+      "evidence_id": "J07-E01"
+    },
+    "major_requirements": {
+      "status": "known",
+      "must_have": [],
+      "preferred": [
+        "计算机或信息技术与商科或管理类复合背景"
+      ],
+      "evidence_id": "J07-E01"
+    },
+    "days_per_week": {
+      "status": "unknown",
+      "minimum": null,
+      "maximum": null,
+      "evidence_id": null
+    },
+    "duration_months": {
+      "status": "unknown",
+      "minimum": null,
+      "preferred": null,
+      "evidence_id": null
+    },
+    "earliest_start": {
+      "status": "unknown",
+      "value": null,
+      "evidence_id": null
+    },
+    "language_requirements": [],
+    "interview_mode": null,
+    "other_application_conditions": []
+  },
+  "function_classification": {
+    "official_category": "销售-销售支持",
+    "primary_function": "AI解决方案实施",
+    "secondary_functions": [
+      "企业客户调研",
+      "售前或销售支持",
+      "伙伴培训"
+    ],
+    "adjacent_role_names": [
+      "FDE",
+      "解决方案顾问",
+      "售前解决方案",
+      "客户成功"
+    ],
+    "title_task_consistency": "medium",
+    "consistency_explanation": "FDE名称无法直接向普通学生说明客户调研、方案实施和销售支持属性。",
+    "confidence": "high",
+    "evidence_ids": [
+      "J07-E02",
+      "J07-E03",
+      "J07-E04",
+      "J07-E05",
+      "J07-E06"
+    ],
+    "title_transparency": "low",
+    "transparency_explanation": "FDE缩写无法让普通学生直接理解客户调研、方案实施和销售支持内容。"
+  },
+  "tasks": [
+    {
+      "task_id": "J07-T01",
+      "normalized_task": "企业客户业务调研与痛点识别",
+      "original_text": "参与企业客户实地调研，理解低效环节和痛点",
+      "importance": "core",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "企业客户",
+        "客户业务流程"
+      ],
+      "deliverables": [
+        "业务痛点与AI机会判断"
+      ],
+      "autonomy_level": "explicit_assist",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J07-E03"
+      ]
+    },
+    {
+      "task_id": "J07-T02",
+      "normalized_task": "AI落地机会识别",
+      "original_text": "发现AI落地实践可能性",
+      "importance": "core",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "企业业务场景"
+      ],
+      "deliverables": [
+        "AI落地机会"
+      ],
+      "autonomy_level": "explicit_assist",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J07-E03"
+      ]
+    },
+    {
+      "task_id": "J07-T03",
+      "normalized_task": "低代码AI解决方案搭建",
+      "original_text": "使用飞书AI产品、自动化工作流和多维表格搭建Demo",
+      "importance": "core",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "企业客户",
+        "飞书AI能力"
+      ],
+      "deliverables": [
+        "Demo",
+        "可投入使用的方案模型"
+      ],
+      "autonomy_level": "unknown",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J07-E04"
+      ]
+    },
+    {
+      "task_id": "J07-T04",
+      "normalized_task": "SOP与模板沉淀",
+      "original_text": "总结为标准化使用指南和演示模板",
+      "importance": "important_support",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "销售团队",
+        "合作伙伴"
+      ],
+      "deliverables": [
+        "SOP",
+        "演示模板"
+      ],
+      "autonomy_level": "unknown",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J07-E05"
+      ]
+    },
+    {
+      "task_id": "J07-T05",
+      "normalized_task": "伙伴培训与技术支持",
+      "original_text": "向代理商和生态伙伴提供培训或技术支持",
+      "importance": "important_support",
+      "estimated_frequency": "unknown",
+      "work_objects": [
+        "代理商",
+        "生态合作伙伴"
+      ],
+      "deliverables": [
+        "培训",
+        "技术支持"
+      ],
+      "autonomy_level": "unknown",
+      "claim_type": "explicit",
+      "confidence": "high",
+      "evidence_ids": [
+        "J07-E06"
+      ]
+    }
+  ],
+  "capability_requirements": [
+    {
+      "capability_id": "J07-C01",
+      "capability_name": "AI与新技术敏感度",
+      "capability_type": "motivation",
+      "requirement_strength": "must",
+      "expected_level": "basic_practical",
+      "learnable_on_job": "partly",
+      "original_text": "对AI和大模型充满热情并乐于实际操作软件工具",
+      "evidence_id": "J07-E07",
+      "confidence": "high",
+      "claim_type": "explicit"
+    },
+    {
+      "capability_id": "J07-C02",
+      "capability_name": "业务问题拆解",
+      "capability_type": "business_analysis",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "将复杂业务问题拆解为清晰逻辑步骤",
+      "evidence_id": "J07-E08",
+      "confidence": "high",
+      "claim_type": "explicit"
+    },
+    {
+      "capability_id": "J07-C03",
+      "capability_name": "非技术沟通",
+      "capability_type": "communication",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "向客户或非技术人员解释技术方案",
+      "evidence_id": "J07-E08",
+      "confidence": "high",
+      "claim_type": "explicit"
+    },
+    {
+      "capability_id": "J07-C04",
+      "capability_name": "探索精神与韧性",
+      "capability_type": "general",
+      "requirement_strength": "must",
+      "expected_level": "strong",
+      "learnable_on_job": "partly",
+      "original_text": "面对未知场景主动寻找解决方案并持续试错",
+      "evidence_id": "J07-E09",
+      "confidence": "high",
+      "claim_type": "explicit"
+    }
+  ],
+  "tool_requirements": [
+    {
+      "tool_name": "飞书AI智能助手",
+      "requirement_strength": "role_context",
+      "expected_level": "learn_on_job_or_unknown",
+      "grouped_with_other_tools": true,
+      "original_text": "运用飞书现有AI产品能力",
+      "evidence_id": "J07-E04"
+    },
+    {
+      "tool_name": "自动化工作流",
+      "requirement_strength": "role_context",
+      "expected_level": "learn_on_job_or_unknown",
+      "grouped_with_other_tools": true,
+      "original_text": "AI智能助手、自动化工作流、多维表格等",
+      "evidence_id": "J07-E04"
+    },
+    {
+      "tool_name": "无代码或低代码工具",
+      "requirement_strength": "preferred",
+      "expected_level": "basic",
+      "grouped_with_other_tools": false,
+      "original_text": "有无代码开发经验者优先",
+      "evidence_id": "J07-E07"
+    }
+  ],
+  "relevance_dimensions": {
+    "ai_relevance": {
+      "level": 3,
+      "evidence_ids": [
+        "J07-E02",
+        "J07-E04"
+      ]
+    },
+    "data_relevance": {
+      "level": 1,
+      "evidence_ids": [
+        "J07-E07"
+      ]
+    },
+    "finance_relevance": {
+      "level": 0,
+      "evidence_ids": []
+    },
+    "product_relevance": {
+      "level": 2,
+      "evidence_ids": [
+        "J07-E04",
+        "J07-E05"
+      ]
+    },
+    "research_relevance": {
+      "level": 1,
+      "evidence_ids": [
+        "J07-E03"
+      ]
+    },
+    "client_facing_relevance": {
+      "level": 3,
+      "evidence_ids": [
+        "J07-E03",
+        "J07-E06"
+      ]
+    }
+  },
+  "work_style": {
+    "customer_communication": {
+      "status": "known",
+      "value": "high",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J07-E03",
+        "J07-E06"
+      ]
+    },
+    "cross_functional_collaboration": {
+      "status": "possible",
+      "value": "medium_or_high",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J07-E02",
+        "J07-E06"
+      ]
+    },
+    "independent_analysis": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    },
+    "research_vs_execution": {
+      "status": "possible",
+      "value": "mixed_execution_leaning",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J07-E03",
+        "J07-E04"
+      ]
+    },
+    "repetitive_work": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    },
+    "open_endedness": {
+      "status": "known",
+      "value": "high",
+      "claim_type": "explicit",
+      "evidence_ids": [
+        "J07-E09"
+      ]
+    },
+    "technical_depth": {
+      "status": "possible",
+      "value": "medium",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J07-E04",
+        "J07-E07"
+      ]
+    },
+    "travel_or_client_site": {
+      "status": "possible",
+      "value": "client_site_possible",
+      "claim_type": "inferred",
+      "evidence_ids": [
+        "J07-E03"
+      ]
+    },
+    "intensity": {
+      "status": "unknown",
+      "value": null,
+      "claim_type": "unknown",
+      "evidence_ids": []
+    }
+  },
+  "job_uncertainties": {
+    "missing_fields": [
+      "每周到岗天数",
+      "实习时长",
+      "最早到岗时间",
+      "客户现场或出差频率",
+      "任务时间占比"
+    ],
+    "contradictions": [],
+    "sensitive_requirements": [],
+    "verification_questions": [
+      "客户调研、方案搭建和培训支持各占多少时间？",
+      "实习生可以独立负责到什么程度？",
+      "是否需要频繁前往客户现场或出差？",
+      "每周到岗和最低实习时长是多少？"
+    ],
+    "warnings": [
+      "岗位官方分类为销售支持，不能直接等同于AI产品经理。"
+    ]
+  },
+  "evidence_registry": [
+    {
+      "evidence_id": "J07-E01",
+      "source_type": "jd",
+      "source_reference": "职位要求1",
+      "source_text": "2027届本科及以上，复合背景优先",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E02",
+      "source_type": "jd",
+      "source_reference": "职位描述1",
+      "source_text": "连接飞书AI产品与企业真实业务需求",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E03",
+      "source_type": "jd",
+      "source_reference": "职位描述2",
+      "source_text": "参与企业客户调研并发现AI落地可能",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E04",
+      "source_type": "jd",
+      "source_reference": "职位描述3",
+      "source_text": "使用AI与低代码工具搭建解决方案Demo",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E05",
+      "source_type": "jd",
+      "source_reference": "职位描述4",
+      "source_text": "沉淀SOP和演示模板",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E06",
+      "source_type": "jd",
+      "source_reference": "职位描述5",
+      "source_text": "向伙伴提供培训或技术支持",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E07",
+      "source_type": "jd",
+      "source_reference": "职位要求2",
+      "source_text": "AI兴趣、实际操作工具、低代码经验优先",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E08",
+      "source_type": "jd",
+      "source_reference": "职位要求3",
+      "source_text": "拆解业务问题并解释技术方案",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "J07-E09",
+      "source_type": "jd",
+      "source_reference": "职位要求4",
+      "source_text": "探索未知场景并持续试错",
+      "claim_type": "explicit",
+      "confidence": "high"
+    }
+  ],
+  "task_clusters": [
+    {
+      "cluster_id": "J07-G01",
+      "cluster_name": "客户业务调研与AI机会识别",
+      "task_ids": [
+        "J07-T01",
+        "J07-T02"
+      ],
+      "importance": "core",
+      "rationale": "两项共同回答客户问题是什么以及AI是否有落地机会。",
+      "evidence_ids": [
+        "J07-E02",
+        "J07-E03"
+      ]
+    },
+    {
+      "cluster_id": "J07-G02",
+      "cluster_name": "AI与低代码解决方案搭建",
+      "task_ids": [
+        "J07-T03"
+      ],
+      "importance": "core",
+      "rationale": "形成可演示或可使用的方案，是独立的动手交付任务。",
+      "evidence_ids": [
+        "J07-E04"
+      ]
+    },
+    {
+      "cluster_id": "J07-G03",
+      "cluster_name": "知识标准化与复用",
+      "task_ids": [
+        "J07-T04"
+      ],
+      "importance": "important_support",
+      "rationale": "把个案沉淀为SOP和模板。",
+      "evidence_ids": [
+        "J07-E05"
+      ]
+    },
+    {
+      "cluster_id": "J07-G04",
+      "cluster_name": "伙伴培训与持续支持",
+      "task_ids": [
+        "J07-T05"
+      ],
+      "importance": "important_support",
+      "rationale": "培训和技术支持与方案搭建的工作偏好不同。",
+      "evidence_ids": [
+        "J07-E06"
+      ]
+    }
+  ],
+  "experience_requirements": []
+}

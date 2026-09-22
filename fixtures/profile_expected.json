@@ -1,0 +1,327 @@
+{
+  "profile_meta": {
+    "profile_version": "profile-v1",
+    "generated_at": "2026-09-21",
+    "input_status": "partial",
+    "source_ids": [
+      "conversation-profile",
+      "jd-analysis-workbook"
+    ],
+    "confirmation_status": "partially_confirmed"
+  },
+  "background": {
+    "school": "中山大学",
+    "college_or_major": "岭南学院金融系",
+    "degree": "本科",
+    "current_year": "大二",
+    "graduation_year": 2029,
+    "current_city": "广州",
+    "languages": [],
+    "optional_academic_records": []
+  },
+  "availability_constraints": {
+    "semester_internship_available": false,
+    "vacation_days_per_week_min": 4,
+    "vacation_days_per_week_max": 5,
+    "duration_months_min": 2,
+    "duration_months_max": 3,
+    "acceptable_locations": [
+      "广州",
+      "深圳",
+      "远程"
+    ],
+    "remote_preference": "accept",
+    "travel_preference": "prefer_not",
+    "intensity_preference": "low"
+  },
+  "skills": [
+    {
+      "skill_id": "P-S01",
+      "skill_name": "Python",
+      "normalized_skill": "python",
+      "self_reported_level": "基础",
+      "evidence_ids": [
+        "P-E04"
+      ],
+      "evidence_strength": "self_report_only",
+      "last_used": null,
+      "displayable_artifact": null,
+      "confirmation_needed": true
+    },
+    {
+      "skill_id": "P-S02",
+      "skill_name": "AI工具应用",
+      "normalized_skill": "ai_tool_usage",
+      "self_reported_level": "有项目实践",
+      "evidence_ids": [
+        "P-E01"
+      ],
+      "evidence_strength": "direct_basic",
+      "last_used": null,
+      "displayable_artifact": "企业官网项目",
+      "confirmation_needed": false
+    },
+    {
+      "skill_id": "P-S03",
+      "skill_name": "结构化与定量分析",
+      "normalized_skill": "structured_quantitative_analysis",
+      "self_reported_level": "有比赛实践",
+      "evidence_ids": [
+        "P-E02",
+        "P-E03"
+      ],
+      "evidence_strength": "transferable",
+      "last_used": null,
+      "displayable_artifact": null,
+      "confirmation_needed": false
+    }
+  ],
+  "experiences": [
+    {
+      "experience_id": "P-X01",
+      "title": "企业官网项目",
+      "organization_or_context": "企业项目",
+      "start_date": null,
+      "end_date": null,
+      "problem": "企业官网需求",
+      "user_actions": [
+        "使用AI工具参与需求到交付"
+      ],
+      "tools": [
+        "AI工具"
+      ],
+      "deliverables": [
+        "企业官网"
+      ],
+      "outcomes": [],
+      "verifiable_materials": [],
+      "prohibited_claims": [
+        "AI产品经理经验",
+        "企业级FDE经验"
+      ],
+      "evidence_ids": [
+        "P-E01"
+      ],
+      "confirmation_needed": true
+    },
+    {
+      "experience_id": "P-X02",
+      "title": "岭南杯案例分析大赛",
+      "organization_or_context": "比赛",
+      "start_date": null,
+      "end_date": null,
+      "problem": null,
+      "user_actions": [],
+      "tools": [],
+      "deliverables": [],
+      "outcomes": [],
+      "verifiable_materials": [],
+      "prohibited_claims": [
+        "企业商业分析经验"
+      ],
+      "evidence_ids": [
+        "P-E02"
+      ],
+      "confirmation_needed": true
+    },
+    {
+      "experience_id": "P-X03",
+      "title": "数学建模比赛",
+      "organization_or_context": "比赛",
+      "start_date": null,
+      "end_date": null,
+      "problem": null,
+      "user_actions": [],
+      "tools": [
+        "Python"
+      ],
+      "deliverables": [],
+      "outcomes": [],
+      "verifiable_materials": [],
+      "prohibited_claims": [
+        "企业数据分析经验"
+      ],
+      "evidence_ids": [
+        "P-E03"
+      ],
+      "confirmation_needed": true
+    }
+  ],
+  "task_preferences": [
+    {
+      "task_name": "AI工具应用",
+      "preference_level": "strong_like",
+      "confidence": "high",
+      "evidence_ids": [
+        "P-E01"
+      ],
+      "status": "confirmed"
+    },
+    {
+      "task_name": "快速搭建解决方案",
+      "preference_level": "strong_like",
+      "confidence": "medium",
+      "evidence_ids": [
+        "P-E01"
+      ],
+      "status": "hypothesis"
+    },
+    {
+      "task_name": "商业与行业分析",
+      "preference_level": "like",
+      "confidence": "medium",
+      "evidence_ids": [
+        "P-E02"
+      ],
+      "status": "hypothesis"
+    },
+    {
+      "task_name": "材料与档案整理",
+      "preference_level": "dislike",
+      "confidence": "medium",
+      "evidence_ids": [
+        "P-E05"
+      ],
+      "status": "confirmed"
+    },
+    {
+      "task_name": "企业客户沟通",
+      "preference_level": "untested",
+      "confidence": "low",
+      "evidence_ids": [],
+      "status": "untested"
+    }
+  ],
+  "work_style_preferences": [
+    {
+      "dimension_name": "analysis_vs_execution",
+      "value": "偏好分析与解决问题",
+      "confidence": "high",
+      "evidence_ids": [
+        "P-E01",
+        "P-E02"
+      ],
+      "status": "confirmed"
+    },
+    {
+      "dimension_name": "visible_output",
+      "value": "偏好可见交付成果",
+      "confidence": "high",
+      "evidence_ids": [
+        "P-E01"
+      ],
+      "status": "confirmed"
+    },
+    {
+      "dimension_name": "technical_depth",
+      "value": "理解技术并动手但不以纯编程为核心",
+      "confidence": "medium",
+      "evidence_ids": [
+        "P-E01"
+      ],
+      "status": "hypothesis"
+    },
+    {
+      "dimension_name": "customer_facing",
+      "value": "未验证",
+      "confidence": "low",
+      "evidence_ids": [],
+      "status": "untested"
+    }
+  ],
+  "career_hypotheses": [
+    {
+      "direction_name": "AI解决方案或FDE",
+      "status": "priority",
+      "supporting_evidence_ids": [
+        "P-E01"
+      ],
+      "unresolved_questions": [
+        "是否喜欢客户沟通与销售支持"
+      ],
+      "next_validation_action": "分析并体验相似岗位任务"
+    },
+    {
+      "direction_name": "商业或战略分析",
+      "status": "priority",
+      "supporting_evidence_ids": [
+        "P-E02",
+        "P-E03"
+      ],
+      "unresolved_questions": [
+        "是否喜欢长期行业研究与跨团队推进"
+      ],
+      "next_validation_action": "完成真实公司分析样本"
+    },
+    {
+      "direction_name": "投后管理",
+      "status": "deprioritized",
+      "supporting_evidence_ids": [
+        "P-E05"
+      ],
+      "unresolved_questions": [
+        "是否喜欢经营分析和风险控制部分"
+      ],
+      "next_validation_action": "暂不优先申请"
+    }
+  ],
+  "profile_gaps": {
+    "missing_information": [
+      "英语能力证据",
+      "项目日期与量化结果"
+    ],
+    "evidence_gaps": [
+      "企业客户调研",
+      "SQL",
+      "用户研究",
+      "跨团队项目推进"
+    ],
+    "confirmed_skill_gaps": [],
+    "contradictions": [],
+    "user_confirmation_questions": [
+      "补充三段经历的行动、结果和可验证材料"
+    ]
+  },
+  "evidence_registry": [
+    {
+      "evidence_id": "P-E01",
+      "source_type": "user_confirmed",
+      "source_reference": "企业官网项目",
+      "source_text": "使用AI完成企业官网需求到交付",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E02",
+      "source_type": "user_confirmed",
+      "source_reference": "岭南杯",
+      "source_text": "案例分析比赛经历",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E03",
+      "source_type": "user_confirmed",
+      "source_reference": "数学建模比赛",
+      "source_text": "定量分析和建模经历",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E04",
+      "source_type": "questionnaire",
+      "source_reference": "用户背景",
+      "source_text": "学过Python、Pandas、NumPy和Matplotlib基础",
+      "claim_type": "explicit",
+      "confidence": "high"
+    },
+    {
+      "evidence_id": "P-E05",
+      "source_type": "user_confirmed",
+      "source_reference": "投后管理JD分析",
+      "source_text": "不偏好长期材料、档案和合规整理",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    }
+  ]
+}

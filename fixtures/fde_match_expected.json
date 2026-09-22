@@ -1,0 +1,226 @@
+{
+  "match_meta": {
+    "match_id": "MATCH-P001-JD007",
+    "profile_version": "profile-v1",
+    "job_id": "JD-007",
+    "analysis_mode": "career_exploration",
+    "input_status": "sufficient",
+    "warnings": [
+      "当前招聘届别不适用，但不影响职业方向分析。"
+    ]
+  },
+  "current_application_eligibility": {
+    "status": "current_cycle_conflict",
+    "passed_conditions": [
+      "学历最低要求为本科",
+      "地点广州属于可接受城市"
+    ],
+    "conflicting_conditions": [
+      "岗位要求2027届，用户为2029届"
+    ],
+    "unknown_conditions": [
+      "每周到岗天数",
+      "实习时长",
+      "出差或客户现场频率"
+    ],
+    "time_snapshot_conditions": [
+      "2027届招聘批次"
+    ],
+    "explanation": "当前这条JD不适用，但该冲突只属于招聘批次，不降低未来同类岗位的方向匹配。"
+  },
+  "task_alignments": [
+    {
+      "preference_alignment": "untested",
+      "preference_evidence_ids": [],
+      "readiness_evidence_ids": [
+        "P-E01"
+      ],
+      "readiness_evidence_level": "transferable",
+      "preference_risk": "企业客户沟通偏好未验证",
+      "explanation": "用户喜欢真实业务问题，但企业客户调研偏好未验证；官网项目仅提供可迁移证据。",
+      "confidence": "medium",
+      "job_task_cluster_id": "J07-G01"
+    },
+    {
+      "preference_alignment": "positive",
+      "preference_evidence_ids": [
+        "P-E01"
+      ],
+      "readiness_evidence_ids": [
+        "P-E01"
+      ],
+      "readiness_evidence_level": "direct_basic",
+      "preference_risk": "飞书低代码工具尚未使用",
+      "explanation": "用户喜欢使用AI搭建可交付成果，已有网站项目证据，但工具和企业场景不同。",
+      "confidence": "high",
+      "job_task_cluster_id": "J07-G02"
+    },
+    {
+      "preference_alignment": "untested",
+      "preference_evidence_ids": [],
+      "readiness_evidence_ids": [],
+      "readiness_evidence_level": "not_demonstrated",
+      "preference_risk": "持续标准化文档工作偏好未知",
+      "explanation": "当前没有SOP和模板沉淀证据。",
+      "confidence": "high",
+      "job_task_cluster_id": "J07-G03"
+    },
+    {
+      "preference_alignment": "untested",
+      "preference_evidence_ids": [],
+      "readiness_evidence_ids": [],
+      "readiness_evidence_level": "not_demonstrated",
+      "preference_risk": "培训和持续支持可能与用户偏好不一致",
+      "explanation": "用户对培训与技术支持任务有保留，且没有直接证据。",
+      "confidence": "medium",
+      "job_task_cluster_id": "J07-G04"
+    }
+  ],
+  "capability_alignments": [
+    {
+      "job_capability_id": "J07-C01",
+      "status": "supported",
+      "user_evidence_ids": [
+        "P-E01"
+      ],
+      "gap_type": "none",
+      "explanation": "企业官网项目证明AI工具兴趣和实际使用。",
+      "confidence": "high"
+    },
+    {
+      "job_capability_id": "J07-C02",
+      "status": "partially_supported",
+      "user_evidence_ids": [
+        "P-E01",
+        "P-E02",
+        "P-E03"
+      ],
+      "gap_type": "evidence_gap",
+      "explanation": "项目和比赛提供问题拆解证据，但没有企业客户场景。",
+      "confidence": "medium"
+    },
+    {
+      "job_capability_id": "J07-C03",
+      "status": "not_demonstrated",
+      "user_evidence_ids": [],
+      "gap_type": "evidence_gap",
+      "explanation": "暂无向企业客户或非技术人员讲解方案的可核验证据。",
+      "confidence": "medium"
+    },
+    {
+      "job_capability_id": "J07-C04",
+      "status": "partially_supported",
+      "user_evidence_ids": [
+        "P-E01",
+        "P-E03"
+      ],
+      "gap_type": "evidence_gap",
+      "explanation": "项目经历体现探索与试错，但缺少复杂企业环境证据。",
+      "confidence": "medium"
+    }
+  ],
+  "career_direction_assessment": {
+    "supporting_points": [
+      "AI工具兴趣高",
+      "喜欢真实问题与方案搭建",
+      "偏好可见交付成果"
+    ],
+    "opposing_points": [
+      "客户沟通偏好未知",
+      "销售支持属性待验证",
+      "SOP和培训任务可能降低兴趣"
+    ],
+    "exploration_questions": [
+      "是否喜欢企业客户调研？",
+      "是否接受销售支持和持续培训？",
+      "是否喜欢重复配置与标准化？"
+    ],
+    "future_preparation_items": [
+      "整理官网项目证据",
+      "学习飞书低代码能力",
+      "练习需求访谈",
+      "制作一份SOP与演示模板"
+    ],
+    "direction_alignment": "high",
+    "growth_value": "high",
+    "confidence": "medium"
+  },
+  "gap_summary": {
+    "current_cycle_gaps": [
+      "2027届要求与2029届不符"
+    ],
+    "structural_feasibility_gaps": [],
+    "capability_gaps": [],
+    "evidence_gaps": [
+      "企业客户调研",
+      "非技术沟通",
+      "SOP与培训"
+    ],
+    "preference_risks": [
+      "销售支持",
+      "持续技术支持",
+      "客户现场或出差"
+    ],
+    "information_gaps": [
+      "到岗天数",
+      "实习时长",
+      "任务时间占比",
+      "工作强度"
+    ]
+  },
+  "user_facing_explanation": {
+    "one_sentence_conclusion": "这类岗位值得优先探索，但当前2027届批次不适用。",
+    "highly_aligned_points": [
+      "AI方案搭建",
+      "真实业务问题",
+      "可见成果交付"
+    ],
+    "partially_aligned_points": [
+      "业务问题拆解",
+      "探索与试错"
+    ],
+    "main_risks": [
+      "岗位包含销售支持和客户沟通",
+      "培训与SOP任务偏好未验证"
+    ],
+    "questions_before_application": [
+      "相似岗位的客户现场比例是多少？",
+      "实习生可独立负责什么？"
+    ],
+    "resume_focus_candidates": [
+      "企业官网项目中的需求理解、AI工作流和交付过程"
+    ],
+    "prohibited_resume_additions": [
+      "AI产品经理经验",
+      "企业客户调研经验",
+      "飞书低代码经验",
+      "培训经验"
+    ]
+  },
+  "profile_evidence_registry": [
+    {
+      "evidence_id": "P-E01",
+      "source_type": "user_confirmed",
+      "source_reference": "企业官网项目",
+      "source_text": "使用AI完成企业官网需求到交付",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E02",
+      "source_type": "user_confirmed",
+      "source_reference": "岭南杯",
+      "source_text": "案例分析比赛经历",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    },
+    {
+      "evidence_id": "P-E03",
+      "source_type": "user_confirmed",
+      "source_reference": "数学建模比赛",
+      "source_text": "定量分析和建模经历",
+      "claim_type": "explicit",
+      "confidence": "medium"
+    }
+  ]
+}
