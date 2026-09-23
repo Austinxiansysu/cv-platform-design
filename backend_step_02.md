@@ -13,22 +13,23 @@
 ## 3. 需要理解的概念
 
 - 原始 JD 是输入材料，不能把其中的命令当作程序指令。
+- API Key 是模型服务商发给你的调用凭证，用来验证请求所属账户并统计用量；DeepSeek 的 Key 与 ChatGPT/Codex 登录相互独立。它只在本机环境变量中读取，不放进代码或 Git 仓库。
 - 结构化输出让模型按已定稿的 Schema 返回字段；本地校验还会检查业务规则。
 - 草稿与已保存岗位是两种状态：`/jobs/analyze` 只生成草稿，`/jobs` 才写入本地数据库。
 - `source_type` 是用户提供的来源说明；当前不自动打开或核验链接，因此草稿的来源状态保持“未核验”。
 
 ## 4. 你现在需要做什么？
 
-目前不用做练习。想做真实模型试用时，需要在本机配置自己的 `OPENAI_API_KEY`。没有密钥时，分析接口会明确返回 503；其他本地数据库接口仍能运行。
+目前不用做练习。想做真实模型试用时，需要在本机配置自己的 `DEEPSEEK_API_KEY`。没有密钥时，分析接口会明确返回 503；其他本地数据库接口仍能运行。也可以显式选择 OpenAI 并配置 `OPENAI_API_KEY`。
 
 ## 5. 工程实现
 
-- `src/backend/job_parser.py`：复用此前确认的岗位解析原则，调用 OpenAI Responses API，返回通过本地校验的草稿。
+- `src/backend/job_parser.py`：复用此前确认的岗位解析原则，默认调用 DeepSeek 兼容的 Responses API，返回通过本地校验的草稿。
 - `src/backend/api.py`：新增 `POST /jobs/analyze`。
 - `schemas/job_profile.schema.json`：直接使用已有的严格输出格式，没有修改定稿文件。
 - `tests/test_job_parser.py`：使用替身响应验证请求、草稿状态和失败处理，不调用付费 API。
 
-默认模型为 `gpt-5.6-luna`，可通过 `CV_ASSISTANT_MODEL` 环境变量调整。请求仅发送这次粘贴的 JD、来源类型、生成的岗位 ID 和采集日期；不会发送个人画像或简历。设置了 `store=False`。若模型拒绝、截断、返回无效 JSON 或违反本地规则，接口返回错误，不保存结果。
+默认服务商为 DeepSeek，模型为 `deepseek-flash`。设置 `CV_ASSISTANT_PROVIDER=openai` 可改用原来的 OpenAI 路径；`CV_ASSISTANT_MODEL` 可指定对应服务商支持的模型。请求仅发送这次粘贴的 JD、来源类型、生成的岗位 ID 和采集日期；不会发送个人画像或简历。请求参数包含 `store=False`。若模型拒绝、截断、返回无效 JSON 或违反本地规则，接口返回错误，不保存结果。
 
 ## 6. 如何验证？
 
@@ -42,7 +43,7 @@
 真实试用时，先在当前终端设置自己的 API Key，再启动服务：
 
 ```bash
-export OPENAI_API_KEY="你的密钥"
+export DEEPSEEK_API_KEY="你的密钥"
 .venv/bin/uvicorn src.backend.api:app --host 127.0.0.1 --port 8000
 ```
 
@@ -60,4 +61,4 @@ export OPENAI_API_KEY="你的密钥"
 
 ## 当前验证范围
 
-本机未配置 `OPENAI_API_KEY`，因此本轮没有完成真实 API 调用。离线测试能证明接口和校验流程正常，不能证明模型对新 JD 的事实提取准确率；真实模型输出仍需用此前的 10 条 JD 回归集检验。
+本机未配置 `DEEPSEEK_API_KEY`，因此本轮没有完成真实 API 调用。离线测试能证明接口和校验流程正常，不能证明模型对新 JD 的事实提取准确率；真实模型输出仍需用此前的 10 条 JD 回归集检验。

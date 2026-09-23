@@ -45,6 +45,8 @@ class JobParserTests(unittest.TestCase):
         self.assertEqual(draft["job_meta"]["source_reliability"], "low")
         self.assertFalse(responses.called_with["store"])
         self.assertEqual(responses.called_with["text"]["format"]["type"], "json_schema")
+        self.assertEqual(responses.called_with["model"], "deepseek-flash")
+        self.assertNotIn("strict", responses.called_with["text"]["format"])
 
         with tempfile.TemporaryDirectory() as directory:
             client = TestClient(create_app(Path(directory) / "db.sqlite3"))
@@ -58,7 +60,7 @@ class JobParserTests(unittest.TestCase):
     def test_missing_key_and_invalid_model_output_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             client = TestClient(create_app(Path(directory) / "db.sqlite3"))
-            with patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
+            with patch.dict(os.environ, {"CV_ASSISTANT_PROVIDER": "deepseek", "DEEPSEEK_API_KEY": ""}):
                 response = client.post("/jobs/analyze", json={"jd_text": self.jd})
             self.assertEqual(response.status_code, 503)
             self.assertEqual(client.get("/jobs").json(), [])
@@ -67,6 +69,26 @@ class JobParserTests(unittest.TestCase):
         bad = FakeResponses("{bad json}")
         with self.assertRaises(ParserFailure):
             analyze_job_text(self.jd, "unknown", "user_paste", responses=bad)
+
+    def test_explicit_openai_provider_retains_strict_format(self):
+        responses = FakeResponses(json.dumps(self.job, ensure_ascii=False))
+        with patch.dict(os.environ, {"CV_ASSISTANT_PROVIDER": "openai"}):
+            analyze_job_text(self.jd, "unknown", "user_paste", responses=responses)
+        self.assertEqual(responses.called_with["model"], "gpt-5.6-luna")
+        self.assertTrue(responses.called_with["text"]["format"]["strict"])
+
+    def test_deepseek_provider_uses_its_own_key_and_endpoint(self):
+        responses = FakeResponses(json.dumps(self.job, ensure_ascii=False))
+        with patch.dict(os.environ, {
+            "CV_ASSISTANT_PROVIDER": "deepseek",
+            "DEEPSEEK_API_KEY": "local-test-key",
+        }):
+            with patch("src.backend.job_parser.OpenAI") as client:
+                client.return_value.responses = responses
+                analyze_job_text(self.jd, "unknown", "user_paste")
+        self.assertEqual(client.call_args.kwargs["api_key"], "local-test-key")
+        self.assertEqual(client.call_args.kwargs["base_url"], "https://api.deepseek.com")
+        self.assertEqual(responses.called_with["model"], "deepseek-flash")
 
 
 if __name__ == "__main__":
