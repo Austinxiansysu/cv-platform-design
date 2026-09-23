@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from src.backend.storage import Store
 from src.backend.validation import validate_match_references, validate_payload
+from src.backend.job_parser import ParserFailure, ParserUnavailable, analyze_job_text
 from src.matching.scoring import score_match
 
 
@@ -42,6 +43,17 @@ class ApplicationUpdate(BaseModel):
     status: ApplicationStatus | None = None
     interviewed: bool | None = None
     notes: str | None = None
+
+
+class JobAnalyzeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    jd_text: str = Field(min_length=30, max_length=30000)
+    source_type: Literal[
+        "company_official", "school_channel", "recruiting_platform",
+        "referral_repost", "unknown",
+    ] = "unknown"
+    source_reference: str = Field(default="user_paste", max_length=1000)
 
 
 def _require_valid(kind: str, payload: dict[str, Any]) -> None:
@@ -82,6 +94,20 @@ def create_app(db_path: Path | None = None) -> FastAPI:
             return store.create_job(payload)
         except sqlite3.IntegrityError as error:
             raise HTTPException(status_code=409, detail="Job ID already exists") from error
+
+    @app.post("/jobs/analyze")
+    def analyze_job(request: JobAnalyzeRequest) -> dict[str, Any]:
+        try:
+            draft = analyze_job_text(
+                request.jd_text, request.source_type, request.source_reference
+            )
+        except ParserUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        except ParserFailure as error:
+            raise HTTPException(status_code=502, detail=str(error)) from error
+        if draft["job_meta"]["input_status"] == "incompatible":
+            raise HTTPException(status_code=422, detail="Input does not describe a job")
+        return {"draft": draft, "saved": False}
 
     @app.get("/jobs")
     def list_jobs() -> list[dict[str, Any]]:

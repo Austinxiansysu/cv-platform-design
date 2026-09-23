@@ -3,6 +3,7 @@ __pycache__/
 *.pyo
 .DS_Store
 .venv/
+.env
 data/
 eval_outputs/
 eval_runs/
