@@ -83,7 +83,7 @@ class JobParserTests(unittest.TestCase):
             "CV_ASSISTANT_PROVIDER": "deepseek",
             "DEEPSEEK_API_KEY": "local-test-key",
         }):
-            with patch("src.backend.job_parser.OpenAI") as client:
+            with patch("src.backend.model_gateway.OpenAI") as client:
                 client.return_value.responses = responses
                 analyze_job_text(self.jd, "unknown", "user_paste")
         self.assertEqual(client.call_args.kwargs["api_key"], "local-test-key")

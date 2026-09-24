@@ -14,6 +14,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from src.backend.storage import Store
 from src.backend.validation import validate_match_references, validate_payload
 from src.backend.job_parser import ParserFailure, ParserUnavailable, analyze_job_text
+from src.backend.match_parser import analyze_match
+from src.backend.profile_builder import analyze_profile
 from src.matching.scoring import score_match
 
 
@@ -56,6 +58,33 @@ class JobAnalyzeRequest(BaseModel):
     source_reference: str = Field(default="user_paste", max_length=1000)
 
 
+class MatchAnalyzeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    profile_version: str = Field(min_length=1)
+    job_id: str = Field(min_length=1)
+    consent_to_send_profile: bool = False
+
+
+class ProfileBasics(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    school: str | None = None
+    major: str | None = None
+    degree: str | None = None
+    graduation_year: int | None = None
+    current_city: str | None = None
+
+
+class ProfileAnalyzeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    resume_text: str = Field(min_length=20, max_length=30000)
+    preferences_text: str = Field(min_length=20, max_length=10000)
+    basic_info: ProfileBasics = Field(default_factory=ProfileBasics)
+    consent_to_send_resume: bool = False
+
+
 def _require_valid(kind: str, payload: dict[str, Any]) -> None:
     errors = validate_payload(kind, payload)
     if errors:
@@ -79,6 +108,27 @@ def create_app(db_path: Path | None = None) -> FastAPI:
             return store.create_profile(payload)
         except sqlite3.IntegrityError as error:
             raise HTTPException(status_code=409, detail="Profile version already exists") from error
+
+    @app.post("/profiles/analyze")
+    def analyze_profile_draft(request: ProfileAnalyzeRequest) -> dict[str, Any]:
+        if not request.consent_to_send_resume:
+            raise HTTPException(
+                status_code=422,
+                detail="Confirm sending redacted resume and preference text to the model provider",
+            )
+        try:
+            draft = analyze_profile(
+                request.resume_text,
+                request.preferences_text,
+                request.basic_info.model_dump(),
+            )
+        except ParserUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        except ParserFailure as error:
+            raise HTTPException(status_code=502, detail=str(error)) from error
+        if draft["profile_meta"]["input_status"] == "incompatible":
+            raise HTTPException(status_code=422, detail="Input cannot form a job-seeker profile")
+        return {"draft": draft, "saved": False}
 
     @app.get("/profiles/{profile_version}")
     def get_profile(profile_version: str) -> dict[str, Any]:
@@ -128,6 +178,8 @@ def create_app(db_path: Path | None = None) -> FastAPI:
         job = store.get_job(meta["job_id"])
         if profile is None or job is None:
             raise HTTPException(status_code=404, detail="Referenced profile or job not found")
+        if profile["profile_meta"]["confirmation_status"] == "unconfirmed":
+            raise HTTPException(status_code=422, detail="Confirm the profile before matching")
         errors = validate_match_references(profile, job, alignment)
         if errors:
             raise HTTPException(status_code=422, detail=errors)
@@ -136,6 +188,31 @@ def create_app(db_path: Path | None = None) -> FastAPI:
             return store.create_match(alignment, score)
         except sqlite3.IntegrityError as error:
             raise HTTPException(status_code=409, detail="Match ID already exists") from error
+
+    @app.post("/matches/analyze")
+    def analyze_match_draft(request: MatchAnalyzeRequest) -> dict[str, Any]:
+        if not request.consent_to_send_profile:
+            raise HTTPException(
+                status_code=422,
+                detail="Confirm sending the structured profile and job to the model provider",
+            )
+        profile = store.get_profile(request.profile_version)
+        job = store.get_job(request.job_id)
+        if profile is None or job is None:
+            raise HTTPException(status_code=404, detail="Referenced profile or job not found")
+        if profile["profile_meta"]["confirmation_status"] == "unconfirmed":
+            raise HTTPException(status_code=422, detail="Confirm the profile before matching")
+        try:
+            alignment = analyze_match(profile, job)
+        except ParserUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        except ParserFailure as error:
+            raise HTTPException(status_code=502, detail=str(error)) from error
+        return {
+            "alignment": alignment,
+            "score": score_match(job, alignment),
+            "saved": False,
+        }
 
     @app.get("/matches/{match_id}")
     def get_match(match_id: str) -> dict[str, Any]:

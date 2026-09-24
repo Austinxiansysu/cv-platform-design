@@ -90,4 +90,24 @@ def validate_match_references(
             "path": "$.match_meta.job_id",
             "message": "Match job ID differs from the stored job",
         })
+    profile_evidence_ids = {item["evidence_id"] for item in profile["evidence_registry"]}
+    registry_ids = [item["evidence_id"] for item in alignment["profile_evidence_registry"]]
+    cited_ids: set[str] = set()
+    for task in alignment["task_alignments"]:
+        cited_ids.update(task["preference_evidence_ids"])
+        cited_ids.update(task["readiness_evidence_ids"])
+    for capability in alignment["capability_alignments"]:
+        cited_ids.update(capability["user_evidence_ids"])
+    if (
+        cited_ids - profile_evidence_ids
+        or cited_ids - set(registry_ids)
+        or set(registry_ids) - profile_evidence_ids
+        or len(registry_ids) != len(set(registry_ids))
+    ):
+        errors.append({
+            "severity": "P0",
+            "type": "profile_evidence_mismatch",
+            "path": "$.profile_evidence_registry",
+            "message": "Cited profile evidence must exist in the stored profile and match registry",
+        })
     return errors
