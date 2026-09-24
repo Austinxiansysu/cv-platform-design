@@ -48,12 +48,13 @@ def analyze_job_text(
     source_type: str,
     source_reference: str,
     responses: ResponseClient | None = None,
+    api_key: str | None = None,
 ) -> dict[str, Any]:
     """Return a validated draft. This function never writes to the database."""
 
     provider, settings = provider_settings()
     if responses is None:
-        responses = responses_client(settings)
+        responses = responses_client(settings, api_key)
 
     job_id = f"JD-LOCAL-{uuid4().hex[:12].upper()}"
     collected_at = date.today().isoformat()

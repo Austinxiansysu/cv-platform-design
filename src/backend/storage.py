@@ -111,9 +111,20 @@ class Store:
     def list_jobs(self) -> list[dict[str, Any]]:
         with closing(self._connect()) as connection:
             rows = connection.execute(
-                "SELECT job_id, company, title, created_at FROM jobs ORDER BY created_at DESC, job_id"
+                "SELECT job_id, company, title, payload_json, created_at FROM jobs ORDER BY created_at DESC, job_id"
             ).fetchall()
-        return [dict(row) for row in rows]
+        results = []
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            results.append({
+                "job_id": row["job_id"],
+                "company": row["company"],
+                "title": row["title"],
+                "location": "、".join(payload["basic_conditions"]["locations"]),
+                "primary_function": payload["function_classification"]["primary_function"],
+                "created_at": row["created_at"],
+            })
+        return results
 
     def create_match(self, alignment: dict[str, Any], score: dict[str, Any]) -> dict[str, Any]:
         meta = alignment["match_meta"]

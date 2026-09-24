@@ -8,8 +8,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Literal
 
-from fastapi import Body, FastAPI, HTTPException
-from pydantic import BaseModel, ConfigDict, Field
+from fastapi import Body, FastAPI, HTTPException, Request
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from src.backend.storage import Store
 from src.backend.validation import validate_match_references, validate_payload
@@ -85,6 +85,12 @@ class ProfileAnalyzeRequest(BaseModel):
     consent_to_send_resume: bool = False
 
 
+class ModelKeyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    api_key: SecretStr
+
+
 def _require_valid(kind: str, payload: dict[str, Any]) -> None:
     errors = validate_payload(kind, payload)
     if errors:
@@ -96,10 +102,42 @@ def create_app(db_path: Path | None = None) -> FastAPI:
     store = Store(resolved_path)
     app = FastAPI(title="AI 求职匹配助手 · 本地 API", version="0.1.0")
     app.state.store = store
+    app.state.deepseek_api_key = None
+
+    def require_local(request: Request) -> None:
+        if request.client is None or request.client.host not in {"127.0.0.1", "::1", "testclient"}:
+            raise HTTPException(status_code=403, detail="Model key settings are local-only")
+
+    def runtime_key() -> str | None:
+        return app.state.deepseek_api_key
 
     @app.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/settings/model-status")
+    def model_status() -> dict[str, Any]:
+        provider = os.environ.get("CV_ASSISTANT_PROVIDER", "deepseek").lower()
+        if provider == "deepseek":
+            source = "runtime" if runtime_key() else "environment" if os.environ.get("DEEPSEEK_API_KEY") else "none"
+        else:
+            source = "environment" if os.environ.get("OPENAI_API_KEY") else "none"
+        return {"provider": provider, "configured": source != "none", "source": source}
+
+    @app.post("/settings/model-key")
+    def set_model_key(payload: ModelKeyRequest, request: Request) -> dict[str, Any]:
+        require_local(request)
+        key = payload.api_key.get_secret_value().strip()
+        if len(key) < 20:
+            raise HTTPException(status_code=422, detail="API Key format is too short")
+        app.state.deepseek_api_key = key
+        return {"provider": "deepseek", "configured": True, "source": "runtime", "retention": "process_memory_only"}
+
+    @app.delete("/settings/model-key")
+    def clear_model_key(request: Request) -> dict[str, Any]:
+        require_local(request)
+        app.state.deepseek_api_key = None
+        return model_status()
 
     @app.post("/profiles", status_code=201)
     def create_profile(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
@@ -121,6 +159,7 @@ def create_app(db_path: Path | None = None) -> FastAPI:
                 request.resume_text,
                 request.preferences_text,
                 request.basic_info.model_dump(),
+                api_key=runtime_key(),
             )
         except ParserUnavailable as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
@@ -149,7 +188,8 @@ def create_app(db_path: Path | None = None) -> FastAPI:
     def analyze_job(request: JobAnalyzeRequest) -> dict[str, Any]:
         try:
             draft = analyze_job_text(
-                request.jd_text, request.source_type, request.source_reference
+                request.jd_text, request.source_type, request.source_reference,
+                api_key=runtime_key(),
             )
         except ParserUnavailable as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
@@ -203,7 +243,7 @@ def create_app(db_path: Path | None = None) -> FastAPI:
         if profile["profile_meta"]["confirmation_status"] == "unconfirmed":
             raise HTTPException(status_code=422, detail="Confirm the profile before matching")
         try:
-            alignment = analyze_match(profile, job)
+            alignment = analyze_match(profile, job, api_key=runtime_key())
         except ParserUnavailable as error:
             raise HTTPException(status_code=503, detail=str(error)) from error
         except ParserFailure as error:

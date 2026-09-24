@@ -35,6 +35,9 @@ class BackendApiTests(unittest.TestCase):
 
     def test_full_local_flow_persists_and_recomputes_score(self):
         self._seed_profile_job()
+        listed = self.client.get("/jobs").json()
+        self.assertEqual(listed[0]["job_id"], "JD-007")
+        self.assertEqual(listed[0]["primary_function"], self.job["function_classification"]["primary_function"])
         response = self.client.post("/matches", json=self.match)
         self.assertEqual(response.status_code, 201, response.text)
         self.assertEqual(response.json()["score"]["current_action_label"], "save_job_archetype")

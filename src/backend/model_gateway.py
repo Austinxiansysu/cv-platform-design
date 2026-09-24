@@ -39,9 +39,15 @@ def provider_settings() -> tuple[str, dict[str, str | None]]:
     return provider, PROVIDERS[provider]
 
 
-def responses_client(settings: dict[str, str | None]) -> Any:
+def responses_client(
+    settings: dict[str, str | None], api_key_override: str | None = None
+) -> Any:
     key_name = str(settings["key_name"])
-    api_key = os.environ.get(key_name)
+    api_key = (
+        api_key_override
+        if key_name == "DEEPSEEK_API_KEY" and api_key_override
+        else os.environ.get(key_name)
+    )
     if not api_key:
         raise ModelUnavailable(f"{key_name} is not configured")
     return OpenAI(

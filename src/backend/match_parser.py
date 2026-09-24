@@ -50,11 +50,12 @@ def analyze_match(
     profile: dict[str, Any],
     job: dict[str, Any],
     responses: ResponseClient | None = None,
+    api_key: str | None = None,
 ) -> dict[str, Any]:
     """Return a checked alignment draft. No database write happens here."""
     provider, settings = provider_settings()
     if responses is None:
-        responses = responses_client(settings)
+        responses = responses_client(settings, api_key)
 
     match_id = f"MATCH-LOCAL-{uuid4().hex[:12].upper()}"
     prompt_input = {

@@ -94,6 +94,9 @@ function App() {
   const [jobDraft, setJobDraft] = useState(null), [savedJob, setSavedJob] = useState(null)
   const [matchConsent, setMatchConsent] = useState(false), [matchDraft, setMatchDraft] = useState(null), [savedMatch, setSavedMatch] = useState(null)
   const [applications, setApplications] = useState([])
+  const [jobs, setJobs] = useState([]), [jobSearch, setJobSearch] = useState('')
+  const [settingsOpen, setSettingsOpen] = useState(false), [keyInput, setKeyInput] = useState('')
+  const [modelStatus, setModelStatus] = useState({ provider: 'deepseek', configured: false })
 
   useEffect(() => {
     const selected = JSON.parse(localStorage.getItem('career-desk-selection') || '{}')
@@ -102,11 +105,15 @@ function App() {
       selected.jobId ? api(`/jobs/${encodeURIComponent(selected.jobId)}`).catch(() => null) : null,
       selected.matchId ? api(`/matches/${encodeURIComponent(selected.matchId)}`).catch(() => null) : null,
       api('/applications').catch(() => []),
-    ]).then(([profile, job, match, records]) => {
+      api('/jobs').catch(() => []),
+      api('/settings/model-status').catch(() => ({ provider: 'deepseek', configured: false })),
+    ]).then(([profile, job, match, records, savedJobs, providerStatus]) => {
       if (profile) setSavedProfile(profile)
       if (job) setSavedJob(job)
       if (match) setSavedMatch(match)
       setApplications(records)
+      setJobs(savedJobs)
+      setModelStatus(providerStatus)
       if (profile && job) setStep('match')
       else if (profile) setStep('job')
     })
@@ -119,6 +126,39 @@ function App() {
   }
   function editProfile(field, value) { setProfileInput(x => ({ ...x, [field]: value })); setProfileDraft(null); setProfileChecked(false) }
   function editJob(field, value) { setJobInput(x => ({ ...x, [field]: value })); setJobDraft(null) }
+
+  function saveModelKey(event) {
+    event.preventDefault()
+    run('model-key', async () => {
+      const result = await api('/settings/model-key', { method: 'POST', body: JSON.stringify({ api_key: keyInput }) })
+      setModelStatus(result)
+      setKeyInput('')
+      setSettingsOpen(false)
+      setMessage('DeepSeek Key 已在本次运行中设置。可开始生成分析草稿。')
+    })
+  }
+
+  function clearModelKey() {
+    run('clear-key', async () => {
+      const result = await api('/settings/model-key', { method: 'DELETE' })
+      setModelStatus(result)
+      setKeyInput('')
+      setMessage('本次运行中输入的 Key 已清除。')
+    })
+  }
+
+  function selectSavedJob(jobId) {
+    run('select-job', async () => {
+      const selected = await api(`/jobs/${encodeURIComponent(jobId)}`)
+      setSavedJob(selected)
+      setJobDraft(null)
+      setMatchDraft(null)
+      setSavedMatch(null)
+      remember({ jobId, matchId: null })
+      setStep('match')
+      setMessage('已选择岗位，可以开始匹配。')
+    })
+  }
 
   function analyzeProfile(event) {
     event.preventDefault()
@@ -154,6 +194,7 @@ function App() {
     run('save-job', async () => {
       await api('/jobs', { method: 'POST', body: JSON.stringify(jobDraft) })
       setSavedJob(jobDraft); remember({ jobId: jobDraft.job_meta.job_id, matchId: null })
+      setJobs(current => [{ job_id: jobDraft.job_meta.job_id, company: jobDraft.job_meta.company, title: jobDraft.job_meta.original_title, location: (jobDraft.basic_conditions?.locations || []).join('、'), primary_function: jobDraft.function_classification?.primary_function }, ...current])
       setJobDraft(null); setMatchDraft(null); setSavedMatch(null); setStep('match')
       setMessage('岗位已保存在本机。现在可以分析匹配。')
     })
@@ -204,15 +245,18 @@ function App() {
   }
 
   const visibleProfile = profileDraft || savedProfile, visibleJob = jobDraft || savedJob, visibleMatch = matchDraft || savedMatch
+  const filteredJobs = jobs.filter(job => `${job.company || ''} ${job.title || ''} ${job.location || ''} ${job.primary_function || ''}`.toLowerCase().includes(jobSearch.trim().toLowerCase()))
   return <div className="app-shell">
-    <aside className="sidebar">
-      <div className="brand"><span className="brand-mark">径</span><div><strong>实习路径</strong><span>Career lens</span></div></div>
-      <p className="sidebar-intro">先看清每天做什么，<br />再决定值不值得投。</p>
-      <nav className="step-nav" aria-label="产品流程">{steps.map(([id, label, detail], i) => <button key={id} className={`step-link ${step === id ? 'active' : ''}`} disabled={(i === 1 && !savedProfile) || (i === 2 && (!savedProfile || !savedJob))} onClick={() => { setStep(id); setError(''); setMessage('') }}><span className="step-number">{i + 1}</span><span><strong>{label}</strong><small>{detail}</small></span>{((id === 'profile' && savedProfile) || (id === 'job' && savedJob) || (id === 'match' && savedMatch)) && <span className="step-done">✓</span>}</button>)}</nav>
-      <div className="sidebar-note"><span>本地工作台</span><p>分析草稿由你确认后保存。当前没有自动投递。</p></div>
-    </aside>
+    <header className="site-header">
+      <div className="header-inner">
+        <div className="brand"><span className="brand-mark">径</span><div><strong>实习路径</strong><span>独立研究原型</span></div></div>
+        <nav className="step-nav" aria-label="产品流程">{steps.map(([id, label, detail], i) => <button key={id} className={`step-link ${step === id ? 'active' : ''}`} disabled={(i === 1 && !savedProfile) || (i === 2 && (!savedProfile || !savedJob))} onClick={() => { setStep(id); setError(''); setMessage('') }}><span className="step-number">{i + 1}</span><span><strong>{label}</strong><small>{detail}</small></span>{((id === 'profile' && savedProfile) || (id === 'job' && savedJob) || (id === 'match' && savedMatch)) && <span className="step-done">✓</span>}</button>)}</nav>
+        <div className="header-actions"><span className={`model-pill ${modelStatus.configured ? 'ready' : ''}`}>{modelStatus.configured ? '模型已设置' : '模型未设置'}</span><button className="settings-trigger" type="button" aria-expanded={settingsOpen} onClick={() => { setSettingsOpen(!settingsOpen); setKeyInput('') }}>模型设置</button></div>
+      </div>
+      {settingsOpen && <div className="settings-popover"><div className="settings-heading"><h2>模型连接</h2><button aria-label="关闭模型设置" type="button" onClick={() => { setSettingsOpen(false); setKeyInput('') }}>×</button></div><p>当前服务商：{modelStatus.provider === 'deepseek' ? 'DeepSeek' : 'OpenAI'}。Key 只保存在本机后端当前进程中，关闭服务后需要重新输入。</p>{modelStatus.provider === 'deepseek' ? <form onSubmit={saveModelKey}><Field label="DeepSeek API Key"><input type="password" autoComplete="off" spellCheck="false" value={keyInput} onChange={e => setKeyInput(e.target.value)} placeholder="在这里输入，不要发到聊天里" /></Field><button className="primary-button" type="submit" disabled={!!busy || keyInput.trim().length < 20}>{busy === 'model-key' ? '正在设置…' : '在本机设置 Key'}</button>{modelStatus.source === 'runtime' && <button type="button" className="text-button" onClick={clearModelKey}>清除本次输入</button>}</form> : <p>当前选择 OpenAI，请在启动后端的终端配置 OPENAI_API_KEY。</p>}</div>}
+    </header>
     <main className="main-panel">
-      <header className="topbar"><span>为商科学生设计的岗位理解工具</span><span className="step-count">{steps.findIndex(x => x[0] === step) + 1} / 3</span></header>
+      <div className="topbar"><span>面向商科学生的岗位理解工作台 · 与学院职业指导互补</span><span className="step-count">{steps.findIndex(x => x[0] === step) + 1} / 3</span></div>
       {error && <div className="feedback error" role="alert">{error}</div>}{message && <div className="feedback success" role="status">{message}</div>}
 
       {step === 'profile' && <><div className="page-heading"><p className="section-kicker">从自己出发</p><h1>先说清楚你做过什么，<br />以及想做什么。</h1><p>简历里的经历与偏好会分开理解。可以修改描述，再重新生成草稿。</p></div><div className="workspace-grid">
@@ -232,7 +276,7 @@ function App() {
           <div className="form-grid"><Field label="信息来源"><select value={jobInput.sourceType} onChange={e => editJob('sourceType', e.target.value)}>{sourceOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field><Field label="原始链接或来源说明"><input value={jobInput.sourceReference} onChange={e => editJob('sourceReference', e.target.value)} placeholder="链接或截图说明" /></Field></div>
           <p className="input-note">来源由你填写，系统暂时不会打开链接验证招聘状态。</p><button className="primary-button" disabled={!!busy} type="submit">{busy === 'job' ? '正在解读岗位…' : '生成岗位画像草稿'}</button>
         </form><section className="result-panel" aria-label="岗位画像结果">{visibleJob ? <><JobReview data={visibleJob} />{jobDraft && <div className="result-actions"><p>确认任务与门槛准确后再保存；有误时修改左侧 JD 并重试。</p><button className="secondary-button" disabled={!!busy} onClick={saveJob}>确认并保存岗位</button></div>}{savedJob && !jobDraft && <p className="saved-mark">岗位已保存，可开始匹配。</p>}</> : <Empty symbol="⌕" title="岗位拆解会出现在这里" text="我们会把‘战略’‘AI’‘研究’等标题词翻译为具体任务，并保留未知条件。" />}</section>
-      </div></>}
+      </div><section className="saved-jobs"><div className="saved-jobs-heading"><div><h2>已保存岗位</h2><span>共 {jobs.length} 条</span></div><p>选择一条岗位，继续与个人画像比较。</p></div><div className="job-toolbar"><input aria-label="搜索已保存岗位" value={jobSearch} onChange={e => setJobSearch(e.target.value)} placeholder="搜索公司、岗位、职能、地点…" /><span>按保存时间（新→旧）</span></div>{filteredJobs.length ? <div className="job-card-grid">{filteredJobs.map(job => <button type="button" className="job-card" key={job.job_id} onClick={() => selectSavedJob(job.job_id)}><span className="card-tag">已保存</span><h3>{job.company || '公司待确认'}</h3><p>{job.title}</p><span className="function-pill">{job.primary_function || '职能待确认'}</span><div className="card-footer"><span>⌖ {job.location || '地点待确认'}</span><strong>查看匹配</strong></div></button>)}</div> : <p className="saved-empty">{jobs.length ? '没有符合搜索条件的岗位。' : '还没有保存岗位。先在上方粘贴一条 JD，确认后会出现在这里。'}</p>}</section></>}
 
       {step === 'match' && <><div className="page-heading"><p className="section-kicker">把两边放在一起</p><h1>这份工作适合探索吗？<br />现在值得申请吗？</h1><p>两个问题分别判断。当前招聘时间不合适，不会抹掉一个方向的探索价值。</p></div><div className="workspace-grid">
         <section className="entry-panel match-input"><div className="panel-title"><h2>本次比较</h2><span>已确认的数据</span></div>
