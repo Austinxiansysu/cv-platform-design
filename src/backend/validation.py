@@ -31,8 +31,8 @@ def _validator(kind: str) -> Draft202012Validator:
     return Draft202012Validator(schema)
 
 
-def validate_payload(kind: str, payload: dict[str, Any]) -> list[dict[str, str]]:
-    errors = [
+def validate_structure(kind: str, payload: dict[str, Any]) -> list[dict[str, str]]:
+    return [
         {
             "severity": "P0",
             "type": "schema",
@@ -41,6 +41,10 @@ def validate_payload(kind: str, payload: dict[str, Any]) -> list[dict[str, str]]
         }
         for error in _validator(kind).iter_errors(payload)
     ]
+
+
+def validate_payload(kind: str, payload: dict[str, Any]) -> list[dict[str, str]]:
+    errors = validate_structure(kind, payload)
     if errors:
         return errors
 

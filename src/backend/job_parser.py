@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import date
 from pathlib import Path
 from typing import Any, Protocol
 from uuid import uuid4
 
+from openai import APIConnectionError, APIStatusError, APITimeoutError
+
+from src.backend.job_normalization import normalize_job_profile
 from src.backend.model_gateway import (
     ModelFailure,
     ModelUnavailable,
@@ -16,7 +20,8 @@ from src.backend.model_gateway import (
     response_format,
     responses_client,
 )
-from src.backend.validation import validate_payload
+from src.backend.privacy import redact_contact_details
+from src.backend.validation import validate_payload, validate_structure
 
 
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "job_profile.schema.json"
@@ -32,7 +37,7 @@ JOB_INSTRUCTIONS = """你是求职岗位结构化分析器。只根据用户提�
 6. 岗位主职能由真实任务决定；金融公司不自动等于金融研究，使用 AI 工具不自动等于 AI 产品，行业洞察不自动等于纯研究。
 7. 既往经历写入 experience_requirements；不能伪造用户经历，也不分析特定用户是否适合，不计算匹配分。
 8. 信息不足用 partial 和 unknown；输入不是 JD 时用 incompatible，任务和能力列表留空，不得为填充结构而编造。
-9. 只输出符合给定 Schema 的 JSON。"""
+9. 只输出符合给定 Schema 的 JSON，以 { 开始、以 } 结束，不添加 Markdown 代码围栏、前言或解释。"""
 
 
 ParserUnavailable = ModelUnavailable
@@ -60,7 +65,7 @@ def analyze_job_text(
     collected_at = date.today().isoformat()
     model = os.environ.get("CV_ASSISTANT_MODEL", str(settings["model"]))
     try:
-        response = responses.create(
+        request_options = dict(
             model=model,
             instructions=JOB_INSTRUCTIONS,
             input=(
@@ -74,6 +79,17 @@ def analyze_job_text(
             max_output_tokens=16000,
             store=False,
         )
+        if provider == "deepseek":
+            request_options["reasoning"] = {"effort": "low"}
+        response = responses.create(**request_options)
+    except APIStatusError as error:
+        detail = redact_contact_details(error.response.text[:320])
+        detail = re.sub(r"sk-[A-Za-z0-9_-]{10,}", "[key omitted]", detail)
+        raise ParserFailure(f"Model provider returned HTTP {error.status_code}: {detail}") from error
+    except APITimeoutError as error:
+        raise ParserFailure("Model request timed out") from error
+    except APIConnectionError as error:
+        raise ParserFailure("Could not connect to model provider") from error
     except Exception as error:
         raise ParserFailure("Model request failed") from error
 
@@ -82,7 +98,10 @@ def analyze_job_text(
     try:
         draft = json.loads(response.output_text)
     except json.JSONDecodeError as error:
-        raise ParserFailure("Model response was not valid JSON") from error
+        preview = redact_contact_details(response.output_text[:120])
+        raise ParserFailure(
+            f"Model response was not valid JSON (length={len(response.output_text)}, preview={preview!r})"
+        ) from error
     if not isinstance(draft, dict):
         raise ParserFailure("Model response was not an object")
 
@@ -97,6 +116,10 @@ def analyze_job_text(
     meta["posting_status"] = "unknown"
     meta["source_reliability"] = "low"  # A pasted source has not been independently verified.
 
+    structural_errors = validate_structure("job", draft)
+    if structural_errors:
+        raise ParserFailure(f"Model draft failed schema validation: {structural_errors[:3]}")
+    normalize_job_profile(draft)
     errors = validate_payload("job", draft)
     if errors:
         raise ParserFailure(f"Model draft failed local validation: {errors[:3]}")

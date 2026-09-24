@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import tempfile
@@ -46,6 +47,7 @@ class JobParserTests(unittest.TestCase):
         self.assertFalse(responses.called_with["store"])
         self.assertEqual(responses.called_with["text"]["format"]["type"], "json_schema")
         self.assertEqual(responses.called_with["model"], "deepseek-flash")
+        self.assertEqual(responses.called_with["reasoning"], {"effort": "low"})
         self.assertNotIn("strict", responses.called_with["text"]["format"])
 
         with tempfile.TemporaryDirectory() as directory:
@@ -89,6 +91,23 @@ class JobParserTests(unittest.TestCase):
         self.assertEqual(client.call_args.kwargs["api_key"], "local-test-key")
         self.assertEqual(client.call_args.kwargs["base_url"], "https://api.deepseek.com")
         self.assertEqual(responses.called_with["model"], "deepseek-flash")
+
+    def test_model_semantic_mislabels_are_normalized_before_return(self):
+        model_job = copy.deepcopy(self.job)
+        model_job["capability_requirements"][0]["claim_type"] = "inferred"
+        model_job["capability_requirements"][0]["requirement_strength"] = "must"
+        model_job["basic_conditions"]["other_application_conditions"].append({
+            "condition_name": "学历", "normalized_value": "本科",
+            "requirement_strength": "must", "gate_type": "hard_gate",
+            "evidence_id": "J07-E01",
+        })
+        draft = analyze_job_text(
+            self.jd, "company_official", "user_paste",
+            responses=FakeResponses(json.dumps(model_job, ensure_ascii=False)),
+        )
+        self.assertEqual(draft["capability_requirements"][0]["requirement_strength"], "uncertain")
+        self.assertEqual(draft["basic_conditions"]["other_application_conditions"], [])
+        self.assertTrue(any("系统归一化" in text for text in draft["job_uncertainties"]["warnings"]))
 
 
 if __name__ == "__main__":
