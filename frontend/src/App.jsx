@@ -15,9 +15,15 @@ const actions = { save_job_archetype: '保存岗位类型', not_recommended_now:
 const directions = { priority_direction: '优先探索方向', worth_exploring: '值得探索', low_priority_direction: '低优先级方向', needs_more_experience: '需要更多体验' }
 
 async function api(path, options = {}) {
-  const response = await fetch(`/api${path}`, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } })
+  let response
+  try {
+    response = await fetch(`/api${path}`, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } })
+  } catch {
+    throw new Error('无法连接本机服务。请双击项目中的 start_local.command，保持启动窗口开启，然后刷新页面。')
+  }
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
+    if (response.status >= 500 && !data.detail) throw new Error('本机后端没有响应。请运行 start_local.command 后刷新页面。')
     if (response.status === 503) throw new Error('本机尚未配置模型 API Key。已有结果仍可查看。')
     if (response.status === 502) throw new Error('模型这次没有给出可用结果。请稍后重试，或调整输入内容。')
     throw new Error(typeof data.detail === 'string' ? data.detail : '输入未通过检查，请核对内容后重试。')
@@ -94,12 +100,14 @@ function App() {
   const [jobDraft, setJobDraft] = useState(null), [savedJob, setSavedJob] = useState(null)
   const [matchConsent, setMatchConsent] = useState(false), [matchDraft, setMatchDraft] = useState(null), [savedMatch, setSavedMatch] = useState(null)
   const [applications, setApplications] = useState([])
+  const [backendOnline, setBackendOnline] = useState(true)
   const [jobs, setJobs] = useState([]), [jobSearch, setJobSearch] = useState('')
   const [settingsOpen, setSettingsOpen] = useState(false), [keyInput, setKeyInput] = useState('')
   const [modelStatus, setModelStatus] = useState({ provider: 'deepseek', configured: false })
 
   useEffect(() => {
     const selected = JSON.parse(localStorage.getItem('career-desk-selection') || '{}')
+    api('/health').then(() => setBackendOnline(true)).catch(() => setBackendOnline(false))
     Promise.all([
       selected.profileVersion ? api(`/profiles/${encodeURIComponent(selected.profileVersion)}`).catch(() => null) : null,
       selected.jobId ? api(`/jobs/${encodeURIComponent(selected.jobId)}`).catch(() => null) : null,
@@ -257,6 +265,7 @@ function App() {
     </header>
     <main className="main-panel">
       <div className="topbar"><span>面向商科学生的岗位理解工作台 · 与学院职业指导互补</span><span className="step-count">{steps.findIndex(x => x[0] === step) + 1} / 3</span></div>
+      {!backendOnline && <div className="offline-banner" role="alert">本机服务已停止。双击项目中的 <code>start_local.command</code> 并保持启动窗口开启。<button type="button" onClick={() => window.location.reload()}>重新连接</button></div>}
       {error && <div className="feedback error" role="alert">{error}</div>}{message && <div className="feedback success" role="status">{message}</div>}
 
       {step === 'profile' && <><div className="page-heading"><p className="section-kicker">从自己出发</p><h1>先说清楚你做过什么，<br />以及想做什么。</h1><p>简历里的经历与偏好会分开理解。可以修改描述，再重新生成草稿。</p></div><div className="workspace-grid">

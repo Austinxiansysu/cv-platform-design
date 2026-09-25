@@ -109,6 +109,9 @@
 .feedback { margin: 19px 0 -28px; padding: 12px 15px; font-size: 13px; line-height: 1.5; border-radius: 8px; }
 .feedback.error { background: #fff0ed; color: #9a4332; border: 1px solid #f4cabd; }
 .feedback.success { background: #e5f3ed; color: #216a54; border: 1px solid #c4dfd1; }
+.offline-banner { margin: 18px 0 -20px; padding: 13px 16px; border: 1px solid #e6c4c9; border-radius: 9px; background: #fff4f5; color: #77323d; font-size: 13px; line-height: 1.6; }
+.offline-banner code { font-size: 12px; font-weight: 650; }
+.offline-banner button { border: 0; background: transparent; color: #84232f; font-weight: 650; margin-left: 9px; text-decoration: underline; }
 .page-footer { color: #819197; font-size: 11px; padding: 43px 0 30px; }
 .saved-jobs { margin-top: 54px; }
 .saved-jobs-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; margin-bottom: 19px; }
