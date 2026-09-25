@@ -95,20 +95,61 @@ def normalize_job_profile(profile: dict[str, Any], jd_text: str = "") -> list[st
         if capability["claim_type"] == "inferred" and capability["requirement_strength"] != "uncertain":
             capability["requirement_strength"] = "uncertain"
             changes.append(f"推断能力“{capability['capability_name']}”的要求强度改为不确定")
+        original = capability["original_text"]
+        if jd_text and capability["claim_type"] == "explicit" and capability["requirement_strength"] == "uncertain":
+            if re.search(r"掌握|熟练使用|必须具备", original) and not re.search(r"优先|等|或", original):
+                capability["requirement_strength"] = "must"
+                changes.append(f"明确要求掌握的“{capability['capability_name']}”改为必须")
+        if jd_text and "操作能力" in capability["capability_name"] and re.search(r"愿意.{0,12}操作", original):
+            capability["capability_name"] = "软件工具动手意愿"
+            capability["capability_type"] = "motivation"
+            capability["expected_level"] = "愿意实际操作软件工具"
+            changes.append("将愿意操作软件工具保留为动机，不写成已具备的操作能力")
+        if jd_text and "A/B" in capability["capability_name"] and re.search(r"设计|分析", capability["capability_name"]):
+            if "A/B实验" in original and not re.search(r"A/B实验.{0,8}(?:设计|分析)", original):
+                capability["capability_name"] = "A/B实验能力"
+                changes.append("A/B实验要求未明确设计或分析深度，移除扩写")
 
     if jd_text:
+        kept_tools = []
         for tool in profile["tool_requirements"]:
             if _evidence_from_duties(evidence_items.get(tool["evidence_id"]), jd_text) and tool["requirement_strength"] != "role_context":
                 tool["requirement_strength"] = "role_context"
                 changes.append(f"职责中使用的工具“{tool['tool_name']}”标为工作场景")
+            original = tool["original_text"]
+            if "BI" in tool["tool_name"].upper() and "方法" in original and "工具" not in original:
+                changes.append("BI报表方法属于方法要求，不虚构为独立工具门槛")
+                continue
+            if tool["requirement_strength"] == "uncertain" and re.search(r"掌握|熟练使用|必须具备", original) and not re.search(r"优先|等|或", original):
+                tool["requirement_strength"] = "must"
+                changes.append(f"明确要求掌握的工具“{tool['tool_name']}”改为必须")
+            kept_tools.append(tool)
+        profile["tool_requirements"] = kept_tools
 
     conditions = profile["basic_conditions"]
+    cohorts = conditions["graduation_cohorts"]
+    if jd_text and cohorts["values"] and not any(re.search(r"20\d{2}届|20\d{2}年毕业", item) for item in cohorts["values"]):
+        values = list(cohorts["values"])
+        if any(re.search(r"大一|大二|低年级", item) for item in values) and cohorts["evidence_id"] is not None:
+            conditions["other_application_conditions"].append({
+                "condition_name": "低年级可申请",
+                "normalized_value": "接受" + "、".join(values),
+                "requirement_strength": "role_context",
+                "gate_type": "context",
+                "evidence_id": cohorts["evidence_id"],
+            })
+        cohorts.update({"status": "unknown", "values": [], "requirement_strength": "uncertain", "evidence_id": None})
+        changes.append("“全体在校生/应届/大一大二”等表述不是明确毕业届次")
     degree = _compact(conditions["degree_requirements"]["minimum_degree"])
     kept = []
     for condition in conditions["other_application_conditions"]:
         value = _compact(condition["normalized_value"])
         if value and degree and (value in degree or degree in value):
             changes.append(f"移除与学历要求重复的条件“{condition['condition_name']}”")
+        elif value and any(value == _compact(location) for location in conditions["locations"]):
+            changes.append(f"移除与工作地点重复的条件“{condition['condition_name']}”")
+        elif value and conditions["interview_mode"] and value == _compact(conditions["interview_mode"]):
+            changes.append(f"移除与面试方式重复的条件“{condition['condition_name']}”")
         else:
             kept.append(condition)
     conditions["other_application_conditions"] = kept
@@ -130,7 +171,7 @@ def normalize_job_profile(profile: dict[str, Any], jd_text: str = "") -> list[st
         work_style = profile["work_style"]
         independent = work_style["independent_analysis"]
         independent_evidence = " ".join(evidence.get(x, "") for x in independent["evidence_ids"])
-        if independent["status"] == "known" and "独立" in str(independent["value"]) and not re.search(r"独立|自主负责", independent_evidence):
+        if independent["status"] == "known" and not re.search(r"独立|自主负责|单独负责|主导", independent_evidence):
             independent.update({"status": "unknown", "value": None, "claim_type": "unknown", "evidence_ids": []})
             changes.append("JD 未明确独立负责范围，独立分析程度改为未知")
         technical = work_style["technical_depth"]
@@ -173,6 +214,15 @@ def normalize_job_profile(profile: dict[str, Any], jd_text: str = "") -> list[st
         ]
         if len(uncertainties["sensitive_requirements"]) < before_sensitive:
             changes.append("招聘届别移出敏感偏好字段，保留在资格条件中")
+
+        finance = profile["relevance_dimensions"]["finance_relevance"]
+        finance_task_text = " ".join(task["original_text"] for task in profile["tasks"])
+        if finance["level"] > 1 and not re.search(r"金融|投研|投资|证券|基金|银行|保险|财务|融资|募资|风控", finance_task_text):
+            company = profile["job_meta"]["company"] or ""
+            finance["level"] = 1 if re.search(r"金融|财经|证券|银行|基金|财富|保险|资本|投资", company) else 0
+            if finance["level"] == 0:
+                finance["evidence_ids"] = []
+            changes.append("金融相关度不能只凭公司名称升为重要工作内容")
 
     profile["job_uncertainties"]["warnings"].extend(
         f"系统归一化：{change}；请核对原始 JD。" for change in changes

@@ -81,6 +81,38 @@ class JobNormalizationTests(unittest.TestCase):
         self.assertTrue(any("拆为两个任务簇" in change for change in changes))
         self.assertEqual(validate_payload("job", job), [])
 
+    def test_live_regression_edges_keep_cohorts_skills_and_industry_separate(self):
+        job = json.loads(
+            (ROOT / "fixtures" / "fde_job_profile_expected.json").read_text(encoding="utf-8")
+        )
+        job = copy.deepcopy(job)
+        job["basic_conditions"]["graduation_cohorts"].update({
+            "status": "known", "values": ["应届"],
+            "requirement_strength": "must", "evidence_id": "J07-E01",
+        })
+        capability = job["capability_requirements"][0]
+        capability.update({
+            "capability_name": "SQL", "original_text": "掌握SQL、Python和A/B实验",
+            "claim_type": "explicit", "requirement_strength": "uncertain",
+        })
+        job["job_meta"]["company"] = "中金财富"
+        job["relevance_dimensions"]["finance_relevance"].update({
+            "level": 2, "evidence_ids": ["J07-E01"],
+        })
+        job["tool_requirements"][0].update({
+            "tool_name": "BI报表工具", "original_text": "熟悉BI报表方法",
+            "requirement_strength": "must",
+        })
+
+        changes = normalize_job_profile(job, "任职要求：掌握SQL、Python和A/B实验")
+
+        self.assertEqual(job["basic_conditions"]["graduation_cohorts"]["status"], "unknown")
+        self.assertEqual(job["basic_conditions"]["graduation_cohorts"]["values"], [])
+        self.assertEqual(capability["requirement_strength"], "must")
+        self.assertEqual(job["relevance_dimensions"]["finance_relevance"]["level"], 1)
+        self.assertNotIn("BI报表工具", [tool["tool_name"] for tool in job["tool_requirements"]])
+        self.assertTrue(any("明确要求掌握" in change for change in changes))
+
 
 if __name__ == "__main__":
     unittest.main()

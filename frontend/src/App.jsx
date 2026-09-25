@@ -69,6 +69,7 @@ function JobReview({ data }) {
     <section className="review-block"><h4>主要会做什么</h4><List items={(data.task_clusters || []).map(x => x.cluster_name)} /></section>
     <section className="review-block"><h4>明确要求</h4><List items={[c.degree_requirements?.minimum_degree, ...(c.graduation_cohorts?.values || []), ...(data.capability_requirements || []).filter(x => x.requirement_strength === 'must').map(x => x.capability_name)].filter(Boolean)} /></section>
     <section className="review-block"><h4>岗位没有说清楚</h4><List items={data.job_uncertainties?.missing_fields || []} /></section>
+    <section className="review-block"><h4>系统修正与核验提醒</h4><List items={data.job_uncertainties?.warnings || []} empty="暂时没有额外提醒" /></section>
     <details className="evidence-details"><summary>查看岗位引用的原文证据</summary><List items={(data.evidence_registry || []).map(x => x.source_text)} /></details>
   </div>
 }
