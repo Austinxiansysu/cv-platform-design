@@ -12,7 +12,7 @@ from uuid import uuid4
 
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 
-from src.backend.job_normalization import normalize_job_profile
+from src.backend.job_normalization import normalize_job_profile, normalize_pre_schema
 from src.backend.model_gateway import (
     ModelFailure,
     ModelUnavailable,
@@ -33,11 +33,13 @@ JOB_INSTRUCTIONS = """你是求职岗位结构化分析器。只根据用户提�
 2. 每条关键事实和判断引用 evidence_registry 中的 evidence_id。source_text 应尽量逐字摘录原始 JD。
 3. explicit、inferred、unknown 分开；must、preferred、role_context、background、uncertain 分开。
 4. 仅从明确条件提取学历、届别、地点、每周天数与实习时长。未写出的到岗窗口、出差、加班、工作强度、任务频率和自主程度保持 unknown。
-5. 工具列表如未写明“全部必须”，保留为集合并将逐项强度标为 uncertain。'至少 X-Y 天'不能理解为最多 Y 天。只有明确写出更长时长优先，才填写 preferred。
+5. 职责里会用到的工具标为 role_context；任职要求列出多个工具却未写明“全部必须”时，逐项强度标为 uncertain。'至少 X-Y 天'不能理解为最多 Y 天。只有明确写出更长时长优先，才填写 preferred。
 6. 岗位主职能由真实任务决定；金融公司不自动等于金融研究，使用 AI 工具不自动等于 AI 产品，行业洞察不自动等于纯研究。
-7. 既往经历写入 experience_requirements；不能伪造用户经历，也不分析特定用户是否适合，不计算匹配分。
-8. 信息不足用 partial 和 unknown；输入不是 JD 时用 incompatible，任务和能力列表留空，不得为填充结构而编造。
-9. 只输出符合给定 Schema 的 JSON，以 { 开始、以 } 结束，不添加 Markdown 代码围栏、前言或解释。"""
+7. capability_requirements 主要提取“任职/岗位/职位要求”中的能力。若仅从“职责/描述”推断，claim_type=inferred 且 requirement_strength=uncertain，不能写成 must。学历、专业或留学背景不写成既往实习经验。
+8. 案例SOP或模板沉淀与伙伴培训/技术支持代表不同工作偏好，应分别建 task_clusters。不能从“主动”推断独立负责，也不能从“低代码”推断完全不需编程。客户现场频率和出差仍可能未知。
+9. 招聘届别是申请资格，不是性别、年龄等敏感偏好。首版 missing_fields 只列影响岗位理解或申请决策的项，不列薪资与转正。
+10. 不分析特定用户是否适合，不计算匹配分。信息不足用 partial 和 unknown；输入不是 JD 时用 incompatible，任务和能力列表留空。
+11. 只输出符合给定 Schema 的 JSON，以 { 开始、以 } 结束，不添加 Markdown 代码围栏、前言或解释。"""
 
 
 ParserUnavailable = ModelUnavailable
@@ -116,10 +118,14 @@ def analyze_job_text(
     meta["posting_status"] = "unknown"
     meta["source_reliability"] = "low"  # A pasted source has not been independently verified.
 
+    pre_schema_changes = normalize_pre_schema(draft)
     structural_errors = validate_structure("job", draft)
     if structural_errors:
         raise ParserFailure(f"Model draft failed schema validation: {structural_errors[:3]}")
-    normalize_job_profile(draft)
+    draft["job_uncertainties"]["warnings"].extend(
+        f"系统归一化：{change}；请核对原始 JD。" for change in pre_schema_changes
+    )
+    normalize_job_profile(draft, jd_text)
     errors = validate_payload("job", draft)
     if errors:
         raise ParserFailure(f"Model draft failed local validation: {errors[:3]}")

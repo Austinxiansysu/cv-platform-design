@@ -3,7 +3,7 @@ import json
 import unittest
 from pathlib import Path
 
-from src.backend.job_normalization import normalize_job_profile
+from src.backend.job_normalization import normalize_job_profile, normalize_pre_schema
 from src.backend.validation import validate_payload
 
 
@@ -11,6 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class JobNormalizationTests(unittest.TestCase):
+    def test_unknown_requirement_strength_maps_to_uncertain(self):
+        payload = {"basic_conditions": {"degree_requirements": {
+            "status": "unknown", "requirement_strength": "unknown",
+        }}}
+        changes = normalize_pre_schema(payload)
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(payload["basic_conditions"]["degree_requirements"]["requirement_strength"], "uncertain")
+
     def test_known_mechanical_errors_are_corrected_and_logged(self):
         job = json.loads(
             (ROOT / "fixtures" / "fde_job_profile_expected.json").read_text(encoding="utf-8")
@@ -42,6 +50,35 @@ class JobNormalizationTests(unittest.TestCase):
         self.assertIsNone(conditions["days_per_week"]["maximum"])
         self.assertIsNone(conditions["duration_months"]["preferred"])
         self.assertEqual(len(job["job_uncertainties"]["warnings"]), initial_warning_count + 4)
+        self.assertEqual(validate_payload("job", job), [])
+
+    def test_duties_are_not_applicant_hard_gates_and_distinct_tasks_split(self):
+        job = json.loads(
+            (ROOT / "fixtures" / "fde_job_profile_expected.json").read_text(encoding="utf-8")
+        )
+        job = copy.deepcopy(job)
+        capability = job["capability_requirements"][0]
+        capability.update({
+            "capability_name": "客户调研能力",
+            "claim_type": "explicit",
+            "requirement_strength": "must",
+            "evidence_id": "J07-E03",
+        })
+        next(item for item in job["evidence_registry"] if item["evidence_id"] == "J07-E03")["source_reference"] = "职位描述-2"
+        documentation = job["task_clusters"][2]
+        training = job["task_clusters"][3]
+        documentation["task_ids"].extend(training["task_ids"])
+        documentation["evidence_ids"].extend(training["evidence_ids"])
+        job["task_clusters"] = job["task_clusters"][:3]
+
+        jd_text = (ROOT / "eval_inputs" / "fde_job_prompt_v1.txt").read_text(encoding="utf-8").split("原始 JD：", 1)[1]
+        changes = normalize_job_profile(job, jd_text)
+
+        self.assertEqual(capability["claim_type"], "inferred")
+        self.assertEqual(capability["requirement_strength"], "uncertain")
+        self.assertEqual(len(job["task_clusters"]), 4)
+        self.assertTrue(any("伙伴培训" in cluster["cluster_name"] for cluster in job["task_clusters"]))
+        self.assertTrue(any("拆为两个任务簇" in change for change in changes))
         self.assertEqual(validate_payload("job", job), [])
 
 
