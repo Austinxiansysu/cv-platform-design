@@ -1,0 +1,34 @@
+{
+  "type": "json_schema",
+  "name": "resume_rewrite_v1",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "rewrites": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "experience_id": { "type": "string" },
+            "suggested_sentence": { "type": "string" },
+            "used_source_facts": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "explanation": { "type": "string" }
+          },
+          "required": [
+            "experience_id",
+            "suggested_sentence",
+            "used_source_facts",
+            "explanation"
+          ]
+        }
+      }
+    },
+    "required": ["rewrites"]
+  }
+}

@@ -73,6 +73,18 @@
 .resume-suggestion strong { color: var(--ink); font-size: 13px; }
 .resume-suggestion p { color: var(--ink); font-size: 13px; line-height: 1.65; margin: 8px 0; }
 .resume-suggestion small { display: block; color: var(--muted); font-size: 11px; line-height: 1.55; margin-top: 5px; }
+.rewrite-panel { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 22px; }
+.rewrite-panel h3 { color: var(--ink); font-size: 17px; margin: 0 0 8px; }
+.rewrite-panel > p { color: var(--muted); font-size: 12px; line-height: 1.65; margin: 0; }
+.rewrite-panel .secondary-button { width: 100%; }
+.rewrite-item { background: #fff9fa; border: 1px solid #ecd4d8; border-radius: 10px; padding: 15px; margin-top: 14px; }
+.rewrite-status { display: inline-block; color: #8e3542; font-size: 11px; margin-bottom: 9px; }
+.rewrite-status.fallback { color: #866238; }
+.rewrite-item strong { display: block; font-size: 14px; line-height: 1.7; color: var(--ink); }
+.rewrite-source { border-top: 1px solid var(--line); margin-top: 11px; padding-top: 10px; display: grid; gap: 5px; }
+.rewrite-source span, .rewrite-item small { color: var(--muted); font-size: 11px; line-height: 1.55; }
+.rewrite-item small { display: block; margin-top: 9px; }
+.rewrite-rejection { font-size: 11px; color: #8a4e2c; margin: 9px 0 0; }
 .plain-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
 .plain-list li { position: relative; color: #3c515b; padding-left: 15px; font-size: 13px; line-height: 1.6; }
 .plain-list li::before { content: ''; position: absolute; left: 0; top: .55em; width: 5px; height: 5px; border-radius: 50%; background: var(--teal); }

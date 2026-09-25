@@ -93,6 +93,16 @@ function MatchReview({ alignment, score, resumeAdvice }) {
   </div>
 }
 
+function ResumeRewritePanel({ advice, draft, consent, onConsent, onRewrite, busy }) {
+  if (!advice || advice.suggestions.length === 0) return null
+  return <section className="rewrite-panel">
+    <h3>把真实经历写得更自然</h3>
+    <p>只发送下方列出的经历标题、行动、交付物和岗位关注点。AI 句子不会自动保存或替换简历。</p>
+    {!draft && <><label className="consent"><input type="checkbox" checked={consent} onChange={e => onConsent(e.target.checked)} /><span>同意把这些选中的经历事实发给模型润色</span></label><button className="secondary-button" type="button" disabled={!consent || !!busy} onClick={onRewrite}>{busy === 'rewrite' ? '正在润色…' : '生成待核对的自然表达'}</button></>}
+    {draft && <div className="rewrite-results">{draft.rewrites.map(item => <div className="rewrite-item" key={item.experience_id}><span className={`rewrite-status ${item.model_sentence_accepted ? 'accepted' : 'fallback'}`}>{item.model_sentence_accepted ? 'AI 改写待核对' : 'AI 句子未被采纳，显示保守版本'}</span><strong>{item.suggested_sentence}</strong><div className="rewrite-source"><span>原始行动：{item.original_facts.actions.join('；')}</span><span>原始交付物：{item.original_facts.deliverables.join('、')}</span><span>证据：{item.original_facts.evidence_ids.join('、') || '待补充'}</span></div>{item.rejection_reason && <p className="rewrite-rejection">拦截原因：{item.rejection_reason}</p>}<small>使用前请逐句确认。岗位强调方向没有自动写成经历事实。</small></div>)}</div>}
+  </section>
+}
+
 function App() {
   const [step, setStep] = useState('profile')
   const [busy, setBusy] = useState(''), [error, setError] = useState(''), [message, setMessage] = useState('')
@@ -102,6 +112,7 @@ function App() {
   const [jobDraft, setJobDraft] = useState(null), [savedJob, setSavedJob] = useState(null)
   const [matchConsent, setMatchConsent] = useState(false), [matchDraft, setMatchDraft] = useState(null), [savedMatch, setSavedMatch] = useState(null)
   const [resumeAdvice, setResumeAdvice] = useState(null)
+  const [rewriteConsent, setRewriteConsent] = useState(false), [rewriteDraft, setRewriteDraft] = useState(null)
   const [applications, setApplications] = useState([])
   const [backendOnline, setBackendOnline] = useState(true)
   const [jobs, setJobs] = useState([]), [jobSearch, setJobSearch] = useState('')
@@ -173,6 +184,7 @@ function App() {
       setJobDraft(null)
       setMatchDraft(null)
       setSavedMatch(null)
+      setRewriteDraft(null)
       remember({ jobId, matchId: null })
       setStep('match')
       setMessage('已选择岗位，可以开始匹配。')
@@ -197,7 +209,7 @@ function App() {
       confirmed.profile_meta.confirmation_status = 'confirmed'
       await api('/profiles', { method: 'POST', body: JSON.stringify(confirmed) })
       setSavedProfile(confirmed); remember({ profileVersion: confirmed.profile_meta.profile_version, matchId: null })
-      setProfileDraft(null); setMatchDraft(null); setSavedMatch(null); setStep('job')
+      setProfileDraft(null); setMatchDraft(null); setSavedMatch(null); setRewriteDraft(null); setStep('job')
       setMessage('画像已保存在本机。下一步解读岗位。')
     })
   }
@@ -214,7 +226,7 @@ function App() {
       await api('/jobs', { method: 'POST', body: JSON.stringify(jobDraft) })
       setSavedJob(jobDraft); remember({ jobId: jobDraft.job_meta.job_id, matchId: null })
       setJobs(current => [{ job_id: jobDraft.job_meta.job_id, company: jobDraft.job_meta.company, title: jobDraft.job_meta.original_title, location: (jobDraft.basic_conditions?.locations || []).join('、'), primary_function: jobDraft.function_classification?.primary_function }, ...current])
-      setJobDraft(null); setMatchDraft(null); setSavedMatch(null); setStep('match')
+      setJobDraft(null); setMatchDraft(null); setSavedMatch(null); setRewriteDraft(null); setStep('match')
       setMessage('岗位已保存在本机。现在可以分析匹配。')
     })
   }
@@ -230,8 +242,19 @@ function App() {
     run('save-match', async () => {
       await api('/matches', { method: 'POST', body: JSON.stringify(matchDraft.alignment) })
       setSavedMatch({ alignment: matchDraft.alignment, score: matchDraft.score })
-      remember({ matchId: matchDraft.alignment.match_meta.match_id }); setMatchDraft(null)
+      remember({ matchId: matchDraft.alignment.match_meta.match_id }); setMatchDraft(null); setRewriteDraft(null)
       setMessage('匹配结果已保存在本机。')
+    })
+  }
+  function rewriteExperience() {
+    const matchId = savedMatch?.alignment?.match_meta?.match_id
+    if (!matchId || !rewriteConsent) return
+    run('rewrite', async () => {
+      const result = await api(`/matches/${encodeURIComponent(matchId)}/resume-rewrite`, {
+        method: 'POST', body: JSON.stringify({ consent_to_send_experience_facts: true }),
+      })
+      setRewriteDraft({ matchId, data: result })
+      setMessage('自然改写草稿已生成；请对照原始事实逐句核对。')
     })
   }
   function saveApplication() {
@@ -307,7 +330,7 @@ function App() {
           <p className="input-note">手机号、邮箱和本地文件路径在发送前脱敏。分数由本地规则计算。</p>
           {savedMatch && <button className="text-button" onClick={saveApplication} disabled={!!busy}>把这条岗位加入求职记录</button>}
           <div className="application-section"><h3>求职记录</h3>{applications.length ? <div className="application-list">{applications.map(item => <div key={item.application_id} className="application-item"><div className="application-main"><div><strong>{item.role}</strong><small>{item.company}{item.applied_on ? ` · 投递于 ${item.applied_on}` : ''}{item.interviewed ? ' · 进入过面试' : ''}</small></div><select aria-label={`${item.role}的求职状态`} value={item.status} onChange={e => updateApplication(item.application_id, e.target.value)} disabled={!!busy}>{Object.entries(states).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div><textarea className="application-note" aria-label={`${item.role}的备注`} defaultValue={item.notes} placeholder="记录联系人、面试反馈或下一步" onBlur={e => updateApplicationNotes(item.application_id, e.target.value)} /></div>)}</div> : <p className="muted">还没有记录。保存匹配后可先收藏岗位。</p>}</div>
-        </section><section className="result-panel" aria-label="匹配分析结果">{visibleMatch ? <><MatchReview alignment={visibleMatch.alignment} score={visibleMatch.score} resumeAdvice={!matchDraft && resumeAdvice?.matchId === savedMatch?.alignment?.match_meta?.match_id ? resumeAdvice.data : null} />{matchDraft && <div className="result-actions"><p>请核对支持点、缺口和简历重点。确认后保存这次分析。</p><button className="secondary-button" disabled={!!busy} onClick={saveMatch}>确认并保存匹配</button></div>}{savedMatch && !matchDraft && <p className="saved-mark">匹配结果已保存在本机。</p>}</> : <Empty symbol="◎" title="匹配解释会出现在这里" text="结果会说明哪些任务可能喜欢、哪些能力有证据、哪些条件仍需确认。" />}</section>
+        </section><section className="result-panel" aria-label="匹配分析结果">{visibleMatch ? <><MatchReview alignment={visibleMatch.alignment} score={visibleMatch.score} resumeAdvice={!matchDraft && resumeAdvice?.matchId === savedMatch?.alignment?.match_meta?.match_id ? resumeAdvice.data : null} />{savedMatch && !matchDraft && <ResumeRewritePanel advice={resumeAdvice?.matchId === savedMatch.alignment.match_meta.match_id ? resumeAdvice.data : null} draft={rewriteDraft?.matchId === savedMatch.alignment.match_meta.match_id ? rewriteDraft.data : null} consent={rewriteConsent} onConsent={setRewriteConsent} onRewrite={rewriteExperience} busy={busy} />}{matchDraft && <div className="result-actions"><p>请核对支持点、缺口和简历重点。确认后保存这次分析。</p><button className="secondary-button" disabled={!!busy} onClick={saveMatch}>确认并保存匹配</button></div>}{savedMatch && !matchDraft && <p className="saved-mark">匹配结果已保存在本机。</p>}</> : <Empty symbol="◎" title="匹配解释会出现在这里" text="结果会说明哪些任务可能喜欢、哪些能力有证据、哪些条件仍需确认。" />}</section>
       </div></>}
       <footer className="page-footer">实习路径 · 第一版研究原型　|　AI 分析需要核对，投递始终由你决定。</footer>
     </main>

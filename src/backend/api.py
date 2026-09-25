@@ -16,6 +16,7 @@ from src.backend.validation import validate_match_references, validate_payload
 from src.backend.job_parser import ParserFailure, ParserUnavailable, analyze_job_text
 from src.backend.match_parser import analyze_match
 from src.backend.profile_builder import analyze_profile
+from src.backend.resume_rewriter import rewrite_resume_advice
 from src.matching.scoring import score_match
 from src.matching.resume_advice import build_resume_advice
 
@@ -65,6 +66,12 @@ class MatchAnalyzeRequest(BaseModel):
     profile_version: str = Field(min_length=1)
     job_id: str = Field(min_length=1)
     consent_to_send_profile: bool = False
+
+
+class ResumeRewriteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    consent_to_send_experience_facts: bool = False
 
 
 class ProfileBasics(BaseModel):
@@ -273,6 +280,27 @@ def create_app(db_path: Path | None = None) -> FastAPI:
         if profile is None or job is None:
             raise HTTPException(status_code=404, detail="Referenced profile or job not found")
         return build_resume_advice(profile, job, match["alignment"])
+
+    @app.post("/matches/{match_id}/resume-rewrite")
+    def analyze_resume_rewrite(match_id: str, request: ResumeRewriteRequest) -> dict[str, Any]:
+        if not request.consent_to_send_experience_facts:
+            raise HTTPException(status_code=422, detail="Confirm sending the selected experience facts to the model provider")
+        match = store.get_match(match_id)
+        if match is None:
+            raise HTTPException(status_code=404, detail="Match not found")
+        meta = match["alignment"]["match_meta"]
+        profile = store.get_profile(meta["profile_version"])
+        job = store.get_job(meta["job_id"])
+        if profile is None or job is None:
+            raise HTTPException(status_code=404, detail="Referenced profile or job not found")
+        try:
+            return rewrite_resume_advice(
+                profile, job, match["alignment"], api_key=runtime_key()
+            )
+        except ParserUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        except ParserFailure as error:
+            raise HTTPException(status_code=502, detail=str(error)) from error
 
     @app.post("/applications", status_code=201)
     def create_application(application: ApplicationCreate) -> dict[str, Any]:
