@@ -74,7 +74,7 @@ function JobReview({ data }) {
   </div>
 }
 
-function MatchReview({ alignment, score }) {
+function MatchReview({ alignment, score, resumeAdvice }) {
   const text = alignment.user_facing_explanation || {}
   return <div className="review-content">
     <div className="review-heading"><h3>匹配结果</h3><p>{text.one_sentence_conclusion || '请结合下方证据判断。'}</p></div>
@@ -88,6 +88,7 @@ function MatchReview({ alignment, score }) {
     <section className="review-block"><h4>申请前值得问</h4><List items={text.questions_before_application || []} /></section>
     <section className="review-block"><h4>简历可强调的真实经历</h4><List items={text.resume_focus_candidates || []} /></section>
     <section className="review-block"><h4>不能写进简历的内容</h4><List items={text.prohibited_resume_additions || []} /></section>
+    {resumeAdvice && <section className="review-block resume-advice"><h4>基于已确认事实的表达草稿</h4><p className="muted">{resumeAdvice.notice}</p>{resumeAdvice.suggestions.map(item => <div className="resume-suggestion" key={item.experience_id}><strong>{item.title}</strong><p>{item.suggested_sentence}</p>{item.job_focus.length > 0 && <small>与岗位相关的强调方向：{item.job_focus.join('；')}。这些方向没有自动写进句子。</small>}<small>证据：{item.source_evidence_ids.join('、') || '待补充'}</small>{item.warnings.map(warning => <small key={warning}>{warning}</small>)}</div>)}{resumeAdvice.needs_more_information.length > 0 && <div className="resume-suggestion"><strong>需要补充事实的经历</strong><List items={resumeAdvice.needs_more_information.map(item => `${item.title}：${item.reason}`)} /></div>}</section>}
     <p className="footnote">分数表示方向证据摘要，不是录取概率。当前资格由行动建议单独表示。</p>
   </div>
 }
@@ -100,6 +101,7 @@ function App() {
   const [profileDraft, setProfileDraft] = useState(null), [profileChecked, setProfileChecked] = useState(false), [savedProfile, setSavedProfile] = useState(null)
   const [jobDraft, setJobDraft] = useState(null), [savedJob, setSavedJob] = useState(null)
   const [matchConsent, setMatchConsent] = useState(false), [matchDraft, setMatchDraft] = useState(null), [savedMatch, setSavedMatch] = useState(null)
+  const [resumeAdvice, setResumeAdvice] = useState(null)
   const [applications, setApplications] = useState([])
   const [backendOnline, setBackendOnline] = useState(true)
   const [jobs, setJobs] = useState([]), [jobSearch, setJobSearch] = useState('')
@@ -127,6 +129,14 @@ function App() {
       else if (profile) setStep('job')
     })
   }, [])
+
+  useEffect(() => {
+    const matchId = savedMatch?.alignment?.match_meta?.match_id
+    if (!matchId) return
+    api(`/matches/${encodeURIComponent(matchId)}/resume-advice`)
+      .then(data => setResumeAdvice({ matchId, data }))
+      .catch(() => setResumeAdvice({ matchId, data: null }))
+  }, [savedMatch])
 
   async function run(name, work) {
     setBusy(name); setError(''); setMessage('')
@@ -297,7 +307,7 @@ function App() {
           <p className="input-note">手机号、邮箱和本地文件路径在发送前脱敏。分数由本地规则计算。</p>
           {savedMatch && <button className="text-button" onClick={saveApplication} disabled={!!busy}>把这条岗位加入求职记录</button>}
           <div className="application-section"><h3>求职记录</h3>{applications.length ? <div className="application-list">{applications.map(item => <div key={item.application_id} className="application-item"><div className="application-main"><div><strong>{item.role}</strong><small>{item.company}{item.applied_on ? ` · 投递于 ${item.applied_on}` : ''}{item.interviewed ? ' · 进入过面试' : ''}</small></div><select aria-label={`${item.role}的求职状态`} value={item.status} onChange={e => updateApplication(item.application_id, e.target.value)} disabled={!!busy}>{Object.entries(states).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div><textarea className="application-note" aria-label={`${item.role}的备注`} defaultValue={item.notes} placeholder="记录联系人、面试反馈或下一步" onBlur={e => updateApplicationNotes(item.application_id, e.target.value)} /></div>)}</div> : <p className="muted">还没有记录。保存匹配后可先收藏岗位。</p>}</div>
-        </section><section className="result-panel" aria-label="匹配分析结果">{visibleMatch ? <><MatchReview alignment={visibleMatch.alignment} score={visibleMatch.score} />{matchDraft && <div className="result-actions"><p>请核对支持点、缺口和简历重点。确认后保存这次分析。</p><button className="secondary-button" disabled={!!busy} onClick={saveMatch}>确认并保存匹配</button></div>}{savedMatch && !matchDraft && <p className="saved-mark">匹配结果已保存在本机。</p>}</> : <Empty symbol="◎" title="匹配解释会出现在这里" text="结果会说明哪些任务可能喜欢、哪些能力有证据、哪些条件仍需确认。" />}</section>
+        </section><section className="result-panel" aria-label="匹配分析结果">{visibleMatch ? <><MatchReview alignment={visibleMatch.alignment} score={visibleMatch.score} resumeAdvice={!matchDraft && resumeAdvice?.matchId === savedMatch?.alignment?.match_meta?.match_id ? resumeAdvice.data : null} />{matchDraft && <div className="result-actions"><p>请核对支持点、缺口和简历重点。确认后保存这次分析。</p><button className="secondary-button" disabled={!!busy} onClick={saveMatch}>确认并保存匹配</button></div>}{savedMatch && !matchDraft && <p className="saved-mark">匹配结果已保存在本机。</p>}</> : <Empty symbol="◎" title="匹配解释会出现在这里" text="结果会说明哪些任务可能喜欢、哪些能力有证据、哪些条件仍需确认。" />}</section>
       </div></>}
       <footer className="page-footer">实习路径 · 第一版研究原型　|　AI 分析需要核对，投递始终由你决定。</footer>
     </main>

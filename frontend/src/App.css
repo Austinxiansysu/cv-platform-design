@@ -68,6 +68,11 @@
 .fact-line strong { color: var(--ink); font-weight: 600; line-height: 1.5; }
 .review-block { border-top: 1px solid var(--line); padding: 18px 0 7px; }
 .review-block h4 { color: var(--ink); font-size: 13px; margin: 0 0 11px; }
+.resume-advice > .muted { margin-bottom: 13px; }
+.resume-suggestion { border-left: 3px solid #c98c95; background: #fbf7f8; margin-top: 12px; padding: 12px 14px; }
+.resume-suggestion strong { color: var(--ink); font-size: 13px; }
+.resume-suggestion p { color: var(--ink); font-size: 13px; line-height: 1.65; margin: 8px 0; }
+.resume-suggestion small { display: block; color: var(--muted); font-size: 11px; line-height: 1.55; margin-top: 5px; }
 .plain-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
 .plain-list li { position: relative; color: #3c515b; padding-left: 15px; font-size: 13px; line-height: 1.6; }
 .plain-list li::before { content: ''; position: absolute; left: 0; top: .55em; width: 5px; height: 5px; border-radius: 50%; background: var(--teal); }

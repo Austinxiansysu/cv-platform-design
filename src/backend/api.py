@@ -17,6 +17,7 @@ from src.backend.job_parser import ParserFailure, ParserUnavailable, analyze_job
 from src.backend.match_parser import analyze_match
 from src.backend.profile_builder import analyze_profile
 from src.matching.scoring import score_match
+from src.matching.resume_advice import build_resume_advice
 
 
 DEFAULT_DB = Path(__file__).resolve().parents[2] / "data" / "cv_assistant.sqlite3"
@@ -260,6 +261,18 @@ def create_app(db_path: Path | None = None) -> FastAPI:
         if match is None:
             raise HTTPException(status_code=404, detail="Match not found")
         return match
+
+    @app.get("/matches/{match_id}/resume-advice")
+    def get_resume_advice(match_id: str) -> dict[str, Any]:
+        match = store.get_match(match_id)
+        if match is None:
+            raise HTTPException(status_code=404, detail="Match not found")
+        meta = match["alignment"]["match_meta"]
+        profile = store.get_profile(meta["profile_version"])
+        job = store.get_job(meta["job_id"])
+        if profile is None or job is None:
+            raise HTTPException(status_code=404, detail="Referenced profile or job not found")
+        return build_resume_advice(profile, job, match["alignment"])
 
     @app.post("/applications", status_code=201)
     def create_application(application: ApplicationCreate) -> dict[str, Any]:
