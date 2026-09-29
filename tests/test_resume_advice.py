@@ -54,6 +54,16 @@ class ResumeAdviceTests(unittest.TestCase):
             self.assertEqual(response.json()["suggestions"], [])
             client.close()
 
+    def test_one_eligible_experience_keeps_paraphrased_job_focus(self):
+        profile = copy.deepcopy(self.profile)
+        profile["profile_meta"]["confirmation_status"] = "confirmed"
+        match = copy.deepcopy(self.match)
+        match["user_facing_explanation"]["resume_focus_candidates"] = [
+            "网站需求理解与交付过程",
+        ]
+        advice = build_resume_advice(profile, self.job, match)
+        self.assertEqual(advice["suggestions"][0]["job_focus"], ["网站需求理解与交付过程"])
+
 
 if __name__ == "__main__":
     unittest.main()
