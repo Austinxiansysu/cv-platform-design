@@ -16,7 +16,8 @@ from src.backend.model_gateway import (
     responses_client,
 )
 from src.backend.privacy import redact_contact_details
-from src.backend.validation import validate_match_references, validate_payload
+from src.backend.match_normalization import normalize_match_alignment
+from src.backend.validation import validate_match_references, validate_payload, validate_structure
 
 
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "match_alignment.schema.json"
@@ -101,7 +102,7 @@ def analyze_match(
     meta["job_id"] = job["job_meta"]["job_id"]
     meta["analysis_mode"] = "career_exploration"
 
-    errors = validate_payload("match", alignment)
+    errors = validate_structure("match", alignment)
     if errors:
         raise ModelFailure(f"Model alignment failed local validation: {errors[:3]}")
 
@@ -109,6 +110,11 @@ def analyze_match(
     used_ids = _referenced_profile_evidence(alignment)
     if used_ids - profile_evidence.keys():
         raise ModelFailure("Model cited a nonexistent profile evidence ID")
+    normalize_match_alignment(profile, job, alignment)
+    errors = validate_payload("match", alignment)
+    if errors:
+        raise ModelFailure(f"Model alignment failed local validation: {errors[:3]}")
+    used_ids = _referenced_profile_evidence(alignment)
     alignment["profile_evidence_registry"] = [
         profile_evidence[evidence_id] for evidence_id in sorted(used_ids)
     ]

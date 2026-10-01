@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { resolveSelection } from './selection'
+import { buildMatchSummary } from './matchSummary'
 
 const steps = [
   ['profile', '认识自己', '经历与偏好'],
@@ -77,32 +78,49 @@ function JobReview({ data }) {
 
 function MatchReview({ alignment, score, resumeAdvice }) {
   const text = alignment.user_facing_explanation || {}
+  const summary = buildMatchSummary(alignment, score)
   return <div className="review-content">
-    <div className="review-heading"><h3>匹配结果</h3><p>{text.one_sentence_conclusion || '请结合下方证据判断。'}</p></div>
-    <div className="verdict-grid">
-      <div className="verdict direction"><span>职业方向</span><strong>{score.career_direction_summary ?? '—'}</strong><p>{directions[score.career_direction_label] || score.career_direction_label}</p></div>
-      <div className="verdict action"><span>当前申请</span><strong>{actions[score.current_action_label] || score.current_action_label}</strong><p>{alignment.current_application_eligibility?.explanation}</p></div>
+    <div className="review-heading"><h3>先看这三个判断</h3><p>先抓住重点，需要时再展开依据。</p></div>
+    <div className="decision-overview">
+      <div><span>值得探索吗？</span><strong>{summary.direction}</strong></div>
+      <div><span>现在能申请吗？</span><strong>{summary.eligibility}</strong><p>{summary.condition}</p></div>
     </div>
-    {score.career_direction_summary == null && <p className="notice">核心任务的偏好证据不足，暂不生成总分。先了解或体验这些任务会更有帮助。</p>}
+    <div className="next-step-summary"><span>下一步做什么？</span><p>{summary.nextStep}</p></div>
+    <div className="brief-reasons"><p><strong>相关基础</strong>{summary.support}</p><p><strong>还需验证</strong>{summary.gap}</p></div>
+    {!summary.hasScore && <p className="summary-caution">偏好证据仍不足，暂不评分。这不等于不匹配。</p>}
+    <details className="analysis-details"><summary>为什么这样判断</summary>
+    <p>{text.one_sentence_conclusion || '请结合下方证据判断。'}</p>
     <section className="review-block"><h4>高度契合</h4><List items={text.highly_aligned_points || []} /></section>
+    <section className="review-block"><h4>部分相关，但还不能等同</h4><List items={text.partially_aligned_points || []} /></section>
     <section className="review-block"><h4>缺口与风险</h4><List items={[...(alignment.gap_summary?.evidence_gaps || []), ...(text.main_risks || [])]} /></section>
+    <section className="review-block"><h4>任务证据</h4><List items={(alignment.task_alignments || []).map(item => `${item.job_task_cluster_id}：${item.explanation}`)} /></section>
+    </details>
+    <details className="analysis-details"><summary>申请条件、评分与复核记录</summary>
+    <p>{alignment.current_application_eligibility?.explanation}</p>
+    <section className="review-block"><h4>明确冲突</h4><List items={alignment.current_application_eligibility?.conflicting_conditions || []} empty="目前没有明确冲突" /></section>
+    <section className="review-block"><h4>尚未确认的条件</h4><List items={alignment.current_application_eligibility?.unknown_conditions || []} /></section>
     <section className="review-block"><h4>申请前值得问</h4><List items={text.questions_before_application || []} /></section>
+    <p>方向判断：{directions[score.career_direction_label] || score.career_direction_label}；申请建议：{actions[score.current_action_label] || score.current_action_label}。</p>
+    <p>任务偏好证据覆盖：{summary.preferencePercent}%（不是匹配分）。方向摘要：{score.career_direction_summary ?? '证据不足，暂不评分'}。分数不是录取概率。</p>
+    {(alignment.match_meta?.warnings || []).length > 0 && <section className="review-block"><h4>复核与修正记录</h4><List items={alignment.match_meta.warnings} /></section>}
+    <section className="review-block"><h4>引用的个人原文证据</h4><List items={(alignment.profile_evidence_registry || []).map(item => `${item.evidence_id}：${item.source_text}`)} /></section>
+    </details>
+    <details className="analysis-details"><summary>简历表达建议与事实边界</summary>
     <section className="review-block"><h4>简历可强调的真实经历</h4><List items={text.resume_focus_candidates || []} /></section>
     <section className="review-block"><h4>不能写进简历的内容</h4><List items={text.prohibited_resume_additions || []} /></section>
-    {(alignment.match_meta?.warnings || []).length > 0 && <section className="review-block"><h4>复核与修正记录</h4><List items={alignment.match_meta.warnings} /></section>}
     {resumeAdvice && <section className="review-block resume-advice"><h4>基于已确认事实的表达草稿</h4><p className="muted">{resumeAdvice.notice}</p>{resumeAdvice.suggestions.map(item => <div className="resume-suggestion" key={item.experience_id}><strong>{item.title}</strong><p>{item.suggested_sentence}</p>{item.job_focus.length > 0 && <small>与岗位相关的强调方向：{item.job_focus.join('；')}。这些方向没有自动写进句子。</small>}<small>证据：{item.source_evidence_ids.join('、') || '待补充'}</small>{item.warnings.map(warning => <small key={warning}>{warning}</small>)}</div>)}{resumeAdvice.needs_more_information.length > 0 && <div className="resume-suggestion"><strong>需要补充事实的经历</strong><List items={resumeAdvice.needs_more_information.map(item => `${item.title}：${item.reason}`)} /></div>}</section>}
-    <p className="footnote">分数表示方向证据摘要，不是录取概率。当前资格由行动建议单独表示。</p>
+    </details>
   </div>
 }
 
 function ResumeRewritePanel({ advice, draft, consent, onConsent, onRewrite, busy }) {
   if (!advice || advice.suggestions.length === 0) return null
-  return <section className="rewrite-panel">
+  return <details className="analysis-details"><summary>生成自然简历表达（可选）</summary><section className="rewrite-panel">
     <h3>把真实经历写得更自然</h3>
     <p>只发送下方列出的经历标题、行动、交付物和岗位关注点。AI 句子不会自动保存或替换简历。</p>
     {!draft && <><label className="consent"><input type="checkbox" checked={consent} onChange={e => onConsent(e.target.checked)} /><span>同意把这些选中的经历事实发给模型润色</span></label><button className="secondary-button" type="button" disabled={!consent || !!busy} onClick={onRewrite}>{busy === 'rewrite' ? '正在润色…' : '生成待核对的自然表达'}</button></>}
     {draft && <div className="rewrite-results">{draft.rewrites.map(item => <div className="rewrite-item" key={item.experience_id}><span className={`rewrite-status ${item.model_sentence_accepted ? 'accepted' : 'fallback'}`}>{item.model_sentence_accepted ? 'AI 改写待核对' : 'AI 句子未被采纳，显示保守版本'}</span><strong>{item.suggested_sentence}</strong><div className="rewrite-source"><span>原始行动：{item.original_facts.actions.join('；')}</span><span>原始交付物：{item.original_facts.deliverables.join('、')}</span><span>证据：{item.original_facts.evidence_ids.join('、') || '待补充'}</span></div>{item.rejection_reason && <p className="rewrite-rejection">拦截原因：{item.rejection_reason}</p>}<small>使用前请逐句确认。岗位强调方向没有自动写成经历事实。</small></div>)}</div>}
-  </section>
+  </section></details>
 }
 
 function App() {
@@ -338,7 +356,7 @@ function App() {
         </form><section className="result-panel" aria-label="岗位画像结果">{visibleJob ? <><JobReview data={visibleJob} />{jobDraft && <div className="result-actions"><p>确认任务与门槛准确后再保存；有误时修改左侧 JD 并重试。</p><button className="secondary-button" disabled={!!busy} onClick={saveJob}>确认并保存岗位</button></div>}{savedJob && !jobDraft && <p className="saved-mark">岗位已保存，可开始匹配。</p>}</> : <Empty symbol="⌕" title="岗位拆解会出现在这里" text="我们会把‘战略’‘AI’‘研究’等标题词翻译为具体任务，并保留未知条件。" />}</section>
       </div><section className="saved-jobs"><div className="saved-jobs-heading"><div><h2>已保存岗位</h2><span>共 {jobs.length} 条</span></div><p>选择一条岗位，继续与个人画像比较。</p></div><div className="job-toolbar"><input aria-label="搜索已保存岗位" value={jobSearch} onChange={e => setJobSearch(e.target.value)} placeholder="搜索公司、岗位、职能、地点…" /><span>按保存时间（新→旧）</span></div>{filteredJobs.length ? <div className="job-card-grid">{filteredJobs.map(job => <button type="button" className="job-card" key={job.job_id} onClick={() => selectSavedJob(job.job_id)}><span className="card-tag">已保存</span><h3>{job.company || '公司待确认'}</h3><p>{job.title}</p><span className="function-pill">{job.primary_function || '职能待确认'}</span><div className="card-footer"><span>⌖ {job.location || '地点待确认'}</span><strong>查看匹配</strong></div></button>)}</div> : <p className="saved-empty">{jobs.length ? '没有符合搜索条件的岗位。' : '还没有保存岗位。先在上方粘贴一条 JD，确认后会出现在这里。'}</p>}</section></>}
 
-      {step === 'match' && <><div className="page-heading"><p className="section-kicker">把两边放在一起</p><h1>这份工作适合探索吗？<br />现在值得申请吗？</h1><p>两个问题分别判断。当前招聘时间不合适，不会抹掉一个方向的探索价值。</p></div><div className="workspace-grid">
+      {step === 'match' && <><div className="page-heading match-page-heading"><h1>岗位匹配结果</h1><p>职业方向与当前申请分开判断。</p></div><div className="workspace-grid match-workspace">
         <section className="entry-panel match-input"><div className="panel-title"><h2>本次比较</h2><span>已确认的数据</span></div>
           <div className="selected-item"><span>个人画像</span><strong>{savedProfile?.background?.school || '画像'} · {savedProfile?.background?.college_or_major || '专业待确认'}</strong><small>{savedProfile?.profile_meta?.profile_version}</small></div>
           <div className="selected-item"><span>岗位画像</span><strong>{savedJob?.job_meta?.original_title}</strong><small>{savedJob?.job_meta?.company || '公司待确认'}</small></div>

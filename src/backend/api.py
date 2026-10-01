@@ -12,11 +12,12 @@ from fastapi import Body, FastAPI, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from src.backend.storage import Store
-from src.backend.validation import validate_match_references, validate_payload
+from src.backend.validation import validate_match_references, validate_payload, validate_structure
 from src.backend.job_parser import ParserFailure, ParserUnavailable, analyze_job_text
 from src.backend.match_parser import analyze_match
 from src.backend.profile_builder import analyze_profile
 from src.backend.resume_rewriter import rewrite_resume_advice
+from src.backend.match_normalization import normalize_match_alignment
 from src.matching.scoring import score_match
 from src.matching.resume_advice import build_resume_advice
 
@@ -230,7 +231,9 @@ def create_app(db_path: Path | None = None) -> FastAPI:
 
     @app.post("/matches", status_code=201)
     def create_match(alignment: dict[str, Any] = Body(...)) -> dict[str, Any]:
-        _require_valid("match", alignment)
+        errors = validate_structure("match", alignment)
+        if errors:
+            raise HTTPException(status_code=422, detail=errors)
         meta = alignment["match_meta"]
         profile = store.get_profile(meta["profile_version"])
         job = store.get_job(meta["job_id"])
@@ -241,6 +244,8 @@ def create_app(db_path: Path | None = None) -> FastAPI:
         errors = validate_match_references(profile, job, alignment)
         if errors:
             raise HTTPException(status_code=422, detail=errors)
+        normalize_match_alignment(profile, job, alignment)
+        _require_valid("match", alignment)
         score = score_match(job, alignment)
         try:
             return store.create_match(alignment, score)
