@@ -18,6 +18,19 @@ def normalize_match_alignment(
     evidence = {item["evidence_id"]: item["source_text"] for item in profile["evidence_registry"]}
     clusters = {item["cluster_id"]: item for item in job["task_clusters"]}
     changes = []
+    eligibility = alignment["current_application_eligibility"]
+    minimum = job["basic_conditions"]["duration_months"]["minimum"]
+    maximum = profile["availability_constraints"]["duration_months_max"]
+    if minimum is not None and maximum is not None and minimum > maximum:
+        conflict = f"当前可实习最多{maximum}个月，低于岗位明确要求的至少{minimum}个月；未确认的分段或远程例外不能消除该冲突。"
+        if eligibility["status"] in {"pass", "pending"}:
+            eligibility["status"] = "current_cycle_conflict"
+            eligibility["explanation"] = conflict + "其他未说明条件仍单独待核实；当期不可行不影响职业方向判断。"
+            changes.append("已知最低实习时长超过用户当前上限，优先判定当期冲突，不用假设例外降为待确认")
+        if conflict not in eligibility["conflicting_conditions"]:
+            eligibility["conflicting_conditions"].append(conflict)
+        if conflict not in alignment["gap_summary"]["current_cycle_gaps"]:
+            alignment["gap_summary"]["current_cycle_gaps"].append(conflict)
     for capability in alignment["capability_alignments"]:
         if capability["status"] == "not_demonstrated" and capability["gap_type"] != "evidence_gap":
             capability["gap_type"] = "evidence_gap"
@@ -27,14 +40,25 @@ def normalize_match_alignment(
     kept = []
     for gap in gaps["structural_feasibility_gaps"]:
         uncertain = any(word in gap for word in ["未知", "无法判断", "可能"])
+        conditional = bool(re.search(r"(?:若|如果|假如|倘若)(?:该)?岗位", gap))
+        explicit_requirement = bool(re.search(r"至少\s*\d|最低\s*\d|明确要求", gap))
         confirmed_conflict = any(word in gap for word in ["不符", "不满足", "无法满足", "超出", "冲突", "不能满足"])
-        if uncertain and not confirmed_conflict:
+        if (uncertain and not confirmed_conflict) or (conditional and not explicit_requirement):
             if gap not in gaps["information_gaps"]:
                 gaps["information_gaps"].append(gap)
             changes.append("将未知或可能的条件从确定结构缺口移入信息缺口")
         else:
             kept.append(gap)
     gaps["structural_feasibility_gaps"] = kept
+    kept_capability = []
+    for gap in gaps["capability_gaps"]:
+        if any(word in gap for word in ["未提供证据", "没有证据", "缺少证据", "未证明", "尚未体验", "未体验"]):
+            if gap not in gaps["evidence_gaps"]:
+                gaps["evidence_gaps"].append(gap)
+            changes.append("将未提供证据的能力摘要移入证据缺口，不视为确认能力不足")
+        else:
+            kept_capability.append(gap)
+    gaps["capability_gaps"] = kept_capability
     corrected_preference = False
     for item in alignment["task_alignments"]:
         cluster = clusters.get(item["job_task_cluster_id"])
