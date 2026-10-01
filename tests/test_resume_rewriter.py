@@ -73,6 +73,61 @@ class ResumeRewriterTests(unittest.TestCase):
         rewrite_resume_advice(self.profile, self.job, self.match, responses=responses)
         self.assertNotIn("test@example.com", responses.called_with["input"])
 
+    def test_requirement_translation_is_preserved_across_role_emphases(self):
+        experience = self.profile["experiences"][0]
+        experience["title"] = "企业网站需求对接"
+        experience["user_actions"] = [
+            "对接企业真实网站需求，了解并整理需求后输出给AI",
+        ]
+        experience["deliverables"] = ["供AI实现的网站需求描述"]
+        experience["tools"] = ["AI工具"]
+        for focus, sentence in (
+            ("AI产品：需求转译", "对接企业真实网站需求，整理为供AI实现的网站需求描述。"),
+            ("商业分析：业务需求理解", "了解并整理企业真实网站需求，输出供AI实现的网站需求描述。"),
+            ("企业数字化：业务与技术衔接", "将对接了解到的企业网站需求整理为供AI实现的描述。"),
+        ):
+            with self.subTest(focus=focus):
+                self.match["user_facing_explanation"]["resume_focus_candidates"] = [focus]
+                output = self._output(sentence)
+                output["rewrites"][0]["used_source_facts"] = [
+                    experience["title"], *experience["user_actions"], *experience["deliverables"],
+                ]
+                result = rewrite_resume_advice(
+                    self.profile, self.job, self.match, responses=FakeResponses(output),
+                )
+                item = result["rewrites"][0]
+                self.assertTrue(item["model_sentence_accepted"])
+                self.assertEqual(item["job_focus"], [focus])
+                self.assertEqual(item["original_facts"]["actions"], experience["user_actions"])
+                self.assertTrue(item["requires_user_review"])
+
+    def test_project_technology_does_not_imply_personal_skill(self):
+        for sentence in (
+            "使用WordPress和PHP完成企业官网项目。",
+            "使用HTML、CSS和JavaScript完成企业官网项目。",
+            "使用Trae完成企业官网项目。",
+            "熟练使用AI工具完成企业官网项目。",
+            "独立实现企业官网项目。",
+        ):
+            with self.subTest(sentence=sentence):
+                result = rewrite_resume_advice(
+                    self.profile, self.job, self.match,
+                    responses=FakeResponses(self._output(sentence)),
+                )
+                item = result["rewrites"][0]
+                self.assertFalse(item["model_sentence_accepted"])
+                self.assertIsNotNone(item["rejection_reason"])
+
+    def test_job_focus_cannot_supply_a_missing_personal_tool(self):
+        self.match["user_facing_explanation"]["resume_focus_candidates"] = [
+            "企业官网岗位需要WordPress与PHP",
+        ]
+        result = rewrite_resume_advice(
+            self.profile, self.job, self.match,
+            responses=FakeResponses(self._output("使用WordPress与PHP参与企业官网项目。")),
+        )
+        self.assertFalse(result["rewrites"][0]["model_sentence_accepted"])
+
     def test_api_requires_consent_and_does_not_save_rewrite(self):
         with tempfile.TemporaryDirectory() as directory:
             client = TestClient(create_app(Path(directory) / "db.sqlite3"))

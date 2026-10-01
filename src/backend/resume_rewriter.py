@@ -27,15 +27,19 @@ TOOL_WORDS = (
     "SQL", "Python", "Pandas", "NumPy", "Matplotlib", "Excel", "Power BI",
     "Tableau", "SPSS", "Figma", "飞书", "Claude Code", "Codex", "AI工具",
     "大模型", "工作流",
+    "WordPress", "PHP", "JavaScript", "TypeScript", "HTML", "CSS", "React",
+    "Next.js", "FastAPI", "Trae",
 )
 HIGH_CLAIM_WORDS = (
     "主导", "独立负责", "负责", "领导", "管理团队", "客户调研", "客户访谈",
     "培训", "上线", "搭建", "开发", "策划", "提升", "增长", "转化率",
     "降低", "节省", "需求分析", "产品设计", "数据建模", "产品经理", "FDE",
+    "熟练", "精通", "独立编写", "独立实现",
 )
 
 REWRITE_INSTRUCTIONS = """你是简历表达编辑，不是经历创作者。只输出 JSON。
 每个候选经历只给一句自然、简洁的中文简历表达。可以调整语序和连接词，但不得添加输入中未出现的行动、工具、角色、日期、数字、结果、客户或技能。岗位关注点只用于选择强调角度，不能变成“我做过”的事实。
+项目产物中存在某种技术，不代表候选人亲自编写代码或掌握该技术。必须保留人和AI各自的贡献边界；需求对接、整理与转译不能自动升级为独立开发、正式访谈、数据分析或效果提升。
 used_source_facts 必须逐字从该经历给出的 title、source_actions、source_deliverables 中选择。若不能安全改写，suggested_sentence 返回空字符串。不要使用“主导”“负责”“提升”等更强动词，除非原始事实本身明确写了。"""
 
 
