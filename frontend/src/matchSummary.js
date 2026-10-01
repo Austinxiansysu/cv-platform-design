@@ -11,7 +11,7 @@ const nextSteps = {
   low_priority: '先比较其他岗位，把这条作为备选。',
 }
 function brief(value, limit = 68) {
-  const plain = value.replace(/（[^）]*个人画像[^）]*）/g, '').replace(/\(must\)/g, '').replace(/用户为/g, '你是').replace(/evidence gap/gi, '证据缺口')
+  const plain = value.replace(/（[^）]*个人画像[^）]*）/g, '').replace(/[（(]\s*must\s*[）)]/g, '').replace(/用户为/g, '你是').replace(/evidence gap/gi, '证据缺口')
   return plain.length > limit ? `${plain.slice(0, limit)}…` : plain
 }
 export function buildMatchSummary(alignment, score) {
