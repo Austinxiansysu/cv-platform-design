@@ -64,6 +64,16 @@ class ResumeAdviceTests(unittest.TestCase):
         advice = build_resume_advice(profile, self.job, match)
         self.assertEqual(advice["suggestions"][0]["job_focus"], ["网站需求理解与交付过程"])
 
+    def test_multiple_unrelated_focus_items_are_not_attached_to_one_experience(self):
+        profile = copy.deepcopy(self.profile)
+        profile["profile_meta"]["confirmation_status"] = "confirmed"
+        match = copy.deepcopy(self.match)
+        match["user_facing_explanation"]["resume_focus_candidates"] = [
+            "案例比赛商业分析", "课堂数学建模", "基础Python学习",
+        ]
+        advice = build_resume_advice(profile, self.job, match)
+        self.assertEqual(advice["suggestions"][0]["job_focus"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

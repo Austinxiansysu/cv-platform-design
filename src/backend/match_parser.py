@@ -35,6 +35,11 @@ MATCH_INSTRUCTIONS = """你是求职证据对齐分析器。个人画像和岗�
 9. 所有个人证据 ID 必须来自输入个人画像的 evidence_registry；profile_evidence_registry 只记录实际引用的个人证据。
 10. 输出是草稿，用户确认后才能保存。"""
 
+MATCH_INSTRUCTIONS += """
+11. 不喜欢合规档案或重复材料整理，不能直接推广为不喜欢方案SOP、知识总结或演示模板；缺少对应任务偏好证据时用untested。
+12. 项目包含某种技术不等于本人掌握；AI辅助建站不自动证明无代码开发、数据结构或飞书平台经验。缺少证据应写“未提供证据”，不能写“从未做过”。
+13. 只输出JSON对象，以{开始、以}结束，不添加Markdown代码围栏、前言或解释。"""
+
 
 def _referenced_profile_evidence(alignment: dict[str, Any]) -> set[str]:
     ids: set[str] = set()
@@ -65,7 +70,7 @@ def analyze_match(
         "job": redact_contact_details(job),
     }
     try:
-        response = responses.create(
+        options = dict(
             model=os.environ.get("CV_ASSISTANT_MODEL", str(settings["model"])),
             instructions=MATCH_INSTRUCTIONS,
             input=json.dumps(prompt_input, ensure_ascii=False),
@@ -73,6 +78,9 @@ def analyze_match(
             max_output_tokens=16000,
             store=False,
         )
+        if provider == "deepseek":
+            options["reasoning"] = {"effort": "low"}
+        response = responses.create(**options)
     except Exception as error:
         raise ModelFailure("Model request failed") from error
 

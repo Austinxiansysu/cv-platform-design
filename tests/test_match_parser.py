@@ -51,6 +51,7 @@ class MatchParserTests(unittest.TestCase):
         self.assertEqual(alignment["profile_evidence_registry"][0]["source_text"],
                          profile["evidence_registry"][0]["source_text"])
         self.assertEqual(responses.called_with["model"], "deepseek-flash")
+        self.assertEqual(responses.called_with["reasoning"], {"effort": "low"})
 
     def test_model_cannot_add_nonexistent_profile_evidence(self):
         result = copy.deepcopy(self.expected)

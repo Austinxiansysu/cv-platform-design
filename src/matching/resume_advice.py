@@ -60,7 +60,7 @@ def build_resume_advice(
             "requires_user_review": True,
         })
 
-    if len(suggestions) == 1 and not suggestions[0]["job_focus"]:
+    if len(suggestions) == 1 and len(focus_candidates) == 1 and not suggestions[0]["job_focus"]:
         suggestions[0]["job_focus"] = list(focus_candidates)
     suggestions.sort(key=lambda item: (-len(item["job_focus"]), item["experience_id"]))
     return {

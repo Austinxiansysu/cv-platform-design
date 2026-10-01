@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import { resolveSelection } from './selection'
 
 const steps = [
   ['profile', '认识自己', '经历与偏好'],
@@ -88,6 +89,7 @@ function MatchReview({ alignment, score, resumeAdvice }) {
     <section className="review-block"><h4>申请前值得问</h4><List items={text.questions_before_application || []} /></section>
     <section className="review-block"><h4>简历可强调的真实经历</h4><List items={text.resume_focus_candidates || []} /></section>
     <section className="review-block"><h4>不能写进简历的内容</h4><List items={text.prohibited_resume_additions || []} /></section>
+    {(alignment.match_meta?.warnings || []).length > 0 && <section className="review-block"><h4>复核与修正记录</h4><List items={alignment.match_meta.warnings} /></section>}
     {resumeAdvice && <section className="review-block resume-advice"><h4>基于已确认事实的表达草稿</h4><p className="muted">{resumeAdvice.notice}</p>{resumeAdvice.suggestions.map(item => <div className="resume-suggestion" key={item.experience_id}><strong>{item.title}</strong><p>{item.suggested_sentence}</p>{item.job_focus.length > 0 && <small>与岗位相关的强调方向：{item.job_focus.join('；')}。这些方向没有自动写进句子。</small>}<small>证据：{item.source_evidence_ids.join('、') || '待补充'}</small>{item.warnings.map(warning => <small key={warning}>{warning}</small>)}</div>)}{resumeAdvice.needs_more_information.length > 0 && <div className="resume-suggestion"><strong>需要补充事实的经历</strong><List items={resumeAdvice.needs_more_information.map(item => `${item.title}：${item.reason}`)} /></div>}</section>}
     <p className="footnote">分数表示方向证据摘要，不是录取概率。当前资格由行动建议单独表示。</p>
   </div>
@@ -120,7 +122,7 @@ function App() {
   const [modelStatus, setModelStatus] = useState({ provider: 'deepseek', configured: false })
 
   useEffect(() => {
-    const selected = JSON.parse(localStorage.getItem('career-desk-selection') || '{}')
+    const selected = resolveSelection(window.location.search, JSON.parse(localStorage.getItem('career-desk-selection') || '{}'))
     api('/health').then(() => setBackendOnline(true)).catch(() => setBackendOnline(false))
     Promise.all([
       selected.profileVersion ? api(`/profiles/${encodeURIComponent(selected.profileVersion)}`).catch(() => null) : null,
