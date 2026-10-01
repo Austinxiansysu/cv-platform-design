@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -78,6 +79,27 @@ class BackendApiTests(unittest.TestCase):
 
         self.assertEqual(self.client.post("/jobs", json=self.job).status_code, 409)
         self.assertEqual(self.client.get("/jobs/not-found").status_code, 404)
+
+    def test_local_profile_import_resets_confirmation_without_saving_or_model_call(self):
+        payload = copy.deepcopy(self.profile)
+        payload["profile_meta"]["confirmation_status"] = "confirmed"
+        with patch("src.backend.api.analyze_profile") as model:
+            response = self.client.post("/profiles/import-draft", json=payload)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertFalse(response.json()["saved"])
+        self.assertEqual(response.json()["draft"]["profile_meta"]["confirmation_status"], "unconfirmed")
+        self.assertEqual(response.json()["draft"]["experiences"], payload["experiences"])
+        model.assert_not_called()
+        version = payload["profile_meta"]["profile_version"]
+        self.assertEqual(self.client.get(f"/profiles/{version}").status_code, 404)
+
+    def test_local_profile_import_rejects_invalid_schema_and_semantics(self):
+        self.assertEqual(self.client.post("/profiles/import-draft", json={}).status_code, 422)
+        payload = copy.deepcopy(self.profile)
+        payload["skills"][0]["skill_name"] = "产业兴趣"
+        response = self.client.post("/profiles/import-draft", json=payload)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["detail"][0]["type"], "interest_as_skill")
 
 
 if __name__ == "__main__":

@@ -177,6 +177,16 @@ def create_app(db_path: Path | None = None) -> FastAPI:
             raise HTTPException(status_code=422, detail="Input cannot form a job-seeker profile")
         return {"draft": draft, "saved": False}
 
+    @app.post("/profiles/import-draft")
+    def import_profile_draft(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        """Validate a local file without a model request or database write."""
+        _require_valid("profile", payload)
+        draft = {
+            **payload,
+            "profile_meta": {**payload["profile_meta"], "confirmation_status": "unconfirmed"},
+        }
+        return {"draft": draft, "saved": False}
+
     @app.get("/profiles/{profile_version}")
     def get_profile(profile_version: str) -> dict[str, Any]:
         profile = store.get_profile(profile_version)

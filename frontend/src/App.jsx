@@ -199,7 +199,21 @@ function App() {
         basic_info: { school: profileInput.school || null, major: profileInput.major || null, degree: profileInput.degree || null, graduation_year: profileInput.graduationYear ? Number(profileInput.graduationYear) : null, current_city: profileInput.city || null },
         consent_to_send_resume: profileInput.consent,
       }) })
-      setProfileDraft(result.draft); setMessage('画像草稿已生成。请核对右侧内容。')
+      setProfileDraft(result.draft); setProfileChecked(false); setMessage('画像草稿已生成。请核对右侧内容。')
+    })
+  }
+  function importProfile(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    run('import-profile', async () => {
+      if (file.size > 300000) throw new Error('画像文件过大，请选择小于 300 KB 的 JSON 文件。')
+      let payload
+      try { payload = JSON.parse(await file.text()) }
+      catch { throw new Error('文件不是有效的 JSON 画像，请检查后重新选择。') }
+      const result = await api('/profiles/import-draft', { method: 'POST', body: JSON.stringify(payload) })
+      setProfileDraft(result.draft); setProfileChecked(false)
+      setMessage('本地画像草稿已导入，未发送给模型、未保存。请核对右侧内容。')
     })
   }
   function saveProfile() {
@@ -306,6 +320,7 @@ function App() {
         <form className="entry-panel" onSubmit={analyzeProfile}><div className="panel-title"><h2>提供你的材料</h2><span>仅供本次分析</span></div>
           <div className="form-grid"><Field label="学校"><input value={profileInput.school} onChange={e => editProfile('school', e.target.value)} placeholder="例如：中山大学" /></Field><Field label="专业"><input value={profileInput.major} onChange={e => editProfile('major', e.target.value)} placeholder="例如：金融学" /></Field><Field label="学历"><input value={profileInput.degree} onChange={e => editProfile('degree', e.target.value)} /></Field><Field label="预计毕业年份"><input type="number" min="2025" max="2045" value={profileInput.graduationYear} onChange={e => editProfile('graduationYear', e.target.value)} placeholder="例如：2029" /></Field></div>
           <Field label="当前城市"><input value={profileInput.city} onChange={e => editProfile('city', e.target.value)} placeholder="例如：广州" /></Field>
+          <Field label="或导入已整理的本地画像" hint="选择 JSON 草稿，只在本机校验，不调用模型；核对后才保存。"><input type="file" accept=".json,application/json" disabled={!!busy} onChange={importProfile} /></Field>
           <Field label="简历经历" hint="粘贴经历正文即可，联系方式会在发送前脱敏。"><textarea rows="9" required minLength="20" value={profileInput.resume} onChange={e => editProfile('resume', e.target.value)} placeholder="写下真实的项目、课程、技能和你具体做了什么。" /></Field>
           <Field label="兴趣与工作偏好" hint="写想做、不想做、实习时间和城市；未知的部分也可以说未知。"><textarea rows="6" required minLength="20" value={profileInput.preferences} onChange={e => editProfile('preferences', e.target.value)} placeholder="例如：喜欢产业研究与数据分析；学期中不到岗，只考虑寒暑假……" /></Field>
           <label className="consent"><input type="checkbox" checked={profileInput.consent} onChange={e => editProfile('consent', e.target.checked)} /><span>同意将脱敏后的简历文字和偏好发给模型分析</span></label>
